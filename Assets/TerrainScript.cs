@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System.Threading.Tasks;
 
 [RequireComponent(typeof(Terrain))]
 
@@ -9,13 +10,11 @@ public class TerrainScript : MonoBehaviour{
     public bool makeItFlat = false;
 
     //Coastline agent
-    public bool UseCoastlineAgents;
     public int CoastlineTokens = 5;
     public int limit = 5;
     ArrayList agents = new ArrayList();
 
     //Smoothing agent
-    public bool UseSmoothingAgents;
     public int smoothingAgentsNr;
     public int returnValue;
     public int smoothingTokens;
@@ -58,31 +57,20 @@ public class TerrainScript : MonoBehaviour{
         //Inizialize heighmap
         heightmap = new float[x,y];
         flat();
+        makeSplatMap();
 
         //Make flat terrain if the checkbox is checked
         if(makeItFlat){
-            flat();
             return;
         }
 
         //Place first coastline agent on terrain and retrieve his children.
         //The children are placed on the terrain and then they are ready for the action.
         //Vector2[] border = new Vector2[]{new Vector2(0, 0), new Vector2(x-1, y-1)}; 
-        if(UseCoastlineAgents){
-            CoastlineAgents ca = new CoastlineAgents(CoastlineTokens, getDirection(), (x-1)*(y-1));
-            GetCoastlineAgents(ca);
-            CoastlineActions();
-        }
+        CoastlineAgents ca = new CoastlineAgents(CoastlineTokens, getDirection(), (x-1)*(y-1));
+        GetCoastlineAgents(ca);
+        StartCoroutine(CoastlineActionsCoroutine());
 
-        if(UseCoastlineAgents && UseSmoothingAgents){
-            SmoothingAction();
-        }
-        
-        if(UseCoastlineAgents && UseSmoothingAgents && UseBeachAgents){
-            BeachAction();
-        }
-
-        makeSplatMap();
     }
 
     //----------------------------- Utilities -----------------------------
@@ -94,15 +82,6 @@ public class TerrainScript : MonoBehaviour{
             }
         }
         td.SetHeights(0, 0, heightmap);
-    }
-
-    private IEnumerable<int> prova(){
-        
-        int i=0;
-        while(i < 5){
-            yield return i;
-            i++;
-        }
     }
 
     private void makeSplatMap(){
@@ -246,6 +225,58 @@ public class TerrainScript : MonoBehaviour{
         //Debug.Log("Number Point Elevated: " + pointToElevate.Count);
 
         td.SetHeights(0, 0, heightmap);
+    }
+
+    private IEnumerator CoastlineActionsCoroutine(){
+        
+        foreach(CoastlineAgents agent in agents){
+            
+            Vector2 startingPoint = findStartingPoint(agent, new Vector2(256.0f, 256.0f));
+
+            //Per come ho strutturato l'algoritmo non ha senso calcolare l'attrattore e il repulsore quando si piazza l'agente perché dato che questo viene piazzato
+            //al centro della mappa (in questo caso nel punto (256, 256)) utilizzando lo stesso attrattore e repulsore ottengo per ogni token gli stessi punti elevati.
+            //Vector2[] ar = getAttractorAndRepulsor(new Vector2[]{new Vector2(0, 0), new Vector2(x-1, y-1)});
+
+            for(int i=0; i<agent.getTokens(); i++){
+
+                Vector2[] adjacentPoints = new Vector2[]{
+                    new Vector2(startingPoint.x+1, startingPoint.y), 
+                    new Vector2(startingPoint.x, startingPoint.y+1), 
+                    new Vector2(startingPoint.x-1, startingPoint.y), 
+                    new Vector2(startingPoint.x, startingPoint.y-1),
+                    new Vector2(startingPoint.x+1, startingPoint.y+1), 
+                    new Vector2(startingPoint.x+1, startingPoint.y-1), 
+                    new Vector2(startingPoint.x-1, startingPoint.y-1), 
+                    new Vector2(startingPoint.x-1, startingPoint.y+1)
+                };
+                
+                List<Vector2> check = new List<Vector2>();
+                foreach(Vector2 point in adjacentPoints){
+                    if((point.x >= 0 && point.x <= (x-1)) && (point.y >= 0 && point.y <= (y-1))){
+                        check.Add(point);
+                    }
+                }
+
+                Vector2[] shuffledArray = shuffle(convertList(check));
+                List<float> scores = new List<float>();
+
+                for(int j=0; j<shuffledArray.Length; j++){
+                    float tmp = scorePoint(shuffledArray[j], agent, getAttractorAndRepulsor(new Vector2[]{new Vector2(0, 0), new Vector2(x-1, y-1)}));
+                    scores.Add(tmp);
+                }
+
+                startingPoint = shuffledArray[scores.IndexOf(scores.Max())];
+
+                if(heightmap[(int)startingPoint.y, (int)startingPoint.x] == 0){
+                    heightmap[(int)startingPoint.y, (int)startingPoint.x] = Random.Range(0.02f, 0.5f);
+                }
+            }
+
+            td.SetHeights(0, 0, heightmap);
+            yield return new WaitForEndOfFrame();
+        }
+
+        yield return smoothActionCoroutine();
     }
 
     private Vector2 findStartingPoint(CoastlineAgents ca, Vector2 position){
@@ -529,6 +560,47 @@ public class TerrainScript : MonoBehaviour{
         }
     }
 
+    private IEnumerator smoothActionCoroutine(){
+
+        for(int i=0; i<smoothingAgentsNr; i++){
+
+            Vector2 startingPoint = getStartingPoint();
+
+            //Count for checking when the smoothing agent need to return to startingPoint
+            int count = 0;
+
+            Vector2 location = startingPoint;
+
+            for(int j=0; j<smoothingTokens; j++){
+
+                if(count > smoothingTokens/returnValue){
+                    location = startingPoint;
+                    count = 0;
+                }
+                else{
+                    //adjusting the value of the point in position location
+                    float newHeight = VonNeumannNeighborhood(location);
+                    heightmap[(int)location.y, (int)location.x] = newHeight;
+                    
+                    location = getNeighboringPoint(location);
+                    count++;
+                }
+            }
+
+            td.SetHeights(0, 0, heightmap);
+            yield return new WaitForEndOfFrame();
+        }
+
+        flatPoints();
+        
+        if(UseBeachAgents){
+            yield return BeachActionCoroutine();
+        }
+        else{
+            makeSplatMap();
+        }
+    }
+
     private Vector2 getStartingPoint(){
 
         int Y = Random.Range(0, y);
@@ -690,6 +762,67 @@ public class TerrainScript : MonoBehaviour{
         }
 
         td.SetHeights(0, 0, heightmap);
+    }
+
+    private IEnumerator BeachActionCoroutine(){
+        getShorelinePoint();
+
+        for(int i=0; i<beachAgentsNr; i++){
+            
+            Vector2 location = (Vector2) shorelinePoint[Random.Range(0, shorelinePoint.Count)];
+
+            for(int j=0; j<BeachTokens; j++){
+
+                if(heightmap[(int)location.y, (int)location.x] >= heighLimit){
+                    //location = random shoreline point
+                    location = (Vector2) shorelinePoint[Random.Range(0, shorelinePoint.Count)];
+                }
+
+                //flatten area.
+                heightmap[(int) location.y, (int)location.x] = Random.Range(.003f, beachHeight);
+                foreach(Vector2 point in neighboringPoint(location)){
+                    heightmap[(int) point.y, (int)point.x] = Random.Range(.003f, beachHeight);
+                }
+                
+                //smooth area. After i flatten the point and the nearby points i can smooth the area.
+                float newHigh = VonNeumannNeighborhood(location);
+                heightmap[(int) location.y, (int) location.x] = newHigh;
+                foreach(Vector2 point in neighboringPoint(location)){
+                    heightmap[(int) point.y, (int)point.x] = VonNeumannNeighborhood(point);
+                }
+
+                //setting away with a random point in a short distance away from location
+                Vector2 away = awayRandomPoint(location);
+
+                for(int k=0; k<randomWalkSize; k++){
+
+                    if(heightmap[(int) away.y, (int) away.x] <= 0.01f){
+                        
+                        //flatten area around away
+                        heightmap[(int) away.y, (int) away.x] = Random.Range(.003f, beachHeight);
+                        foreach(Vector2 point in neighboringPoint(away)){
+                            heightmap[(int) point.y, (int) point.x] = Random.Range(.003f, beachHeight);
+                        }
+
+                        //smooth area around away
+                        heightmap[(int) away.y, (int) away.x] = VonNeumannNeighborhood(away);
+                        foreach(Vector2 point in neighboringPoint(away)){
+                            heightmap[(int) point.y, (int) point.x] = VonNeumannNeighborhood(point);
+                        }
+                        
+                    }
+
+                    away = getNeighboringPoint(away);                
+                }
+
+                location = getNeighboringPoint(location);
+            }
+
+            td.SetHeights(0, 0, heightmap);
+            yield return new WaitForEndOfFrame();
+        }
+
+        makeSplatMap();
     }
 
     private void getShorelinePoint(){

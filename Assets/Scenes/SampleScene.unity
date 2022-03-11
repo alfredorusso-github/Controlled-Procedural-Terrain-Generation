@@ -155,10 +155,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   makeItFlat: 0
-  UseCoastlineAgents: 1
   CoastlineTokens: 1900
   limit: 2063
-  UseSmoothingAgents: 1
   smoothingAgentsNr: 1500
   returnValue: 5
   smoothingTokens: 4000
@@ -403,10 +401,10 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.09796165, y: 0.8131361, z: -0.14337783, w: 0.5555682}
-  m_LocalPosition: {x: -510, y: 175, z: 183}
+  m_LocalRotation: {x: -0.2174167, y: 0.6757206, z: -0.21228196, w: -0.6716161}
+  m_LocalPosition: {x: 416, y: 169, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 20, y: 111.315, z: 0}
+  m_LocalEulerAnglesHint: {x: 35.375, y: 269.456, z: -0.61}
