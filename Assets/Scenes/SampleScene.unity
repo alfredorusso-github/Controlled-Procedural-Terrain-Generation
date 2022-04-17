@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44658822, g: 0.49642307, b: 0.5748253, a: 1}
+  m_IndirectSpecularColor: {r: 0.44658792, g: 0.49642283, b: 0.5748252, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -135,7 +135,7 @@ GameObject:
   - component: {fileID: 77329741}
   - component: {fileID: 77329740}
   - component: {fileID: 77329739}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Terrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -157,6 +157,7 @@ MonoBehaviour:
   makeItFlat: 0
   CoastlineTokens: 1900
   limit: 2063
+  maxHeight: 0.5
   smoothingAgentsNr: 1500
   returnValue: 5
   smoothingTokens: 4000
@@ -167,6 +168,11 @@ MonoBehaviour:
   randomWalkSize: 30
   awayLimit: 3
   beachHeight: 0.01
+  cityAgentsNr: 2
+  cityTokens: 10
+  distance: 10
+  cityAgent: {fileID: 1403033649334648429, guid: 7fa206b34e181281d93764ca27c7024d, type: 3}
+  roads: {fileID: 3089296634764339710, guid: f10b1ee675cddc8fabea24e911072996, type: 3}
   splatHeights:
   - textureIndex: 0
     startingHeight: 0
