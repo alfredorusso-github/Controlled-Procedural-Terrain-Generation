@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44658792, g: 0.49642283, b: 0.5748252, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -310,6 +310,7 @@ GameObject:
   - component: {fileID: 1879195989}
   - component: {fileID: 1879195988}
   - component: {fileID: 1879195987}
+  - component: {fileID: 1879195986}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -317,6 +318,25 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
+--- !u!114 &1879195986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1879195985}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b095da571f8868ef3b566171fb18c17e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cityAgentsNr: 20
+  cityTokens: 10
+  roads: {fileID: 3089296634764339710, guid: f10b1ee675cddc8fabea24e911072996, type: 3}
+  palace: {fileID: 4104808338139126055, guid: d8b6324be2a50ea24b94d6069d4053c0, type: 3}
+  gap: 2
+  distance: 8
+  NumberOfHouse: 3
 --- !u!154 &1879195987
 TerrainCollider:
   m_ObjectHideFlags: 0
