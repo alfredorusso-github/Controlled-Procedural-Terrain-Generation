@@ -134,10 +134,10 @@ GameObject:
   - component: {fileID: 77329742}
   - component: {fileID: 77329741}
   - component: {fileID: 77329740}
-  - component: {fileID: 77329739}
   - component: {fileID: 77329743}
   - component: {fileID: 77329744}
   - component: {fileID: 77329746}
+  - component: {fileID: 77329739}
   - component: {fileID: 77329745}
   m_Layer: 3
   m_Name: Terrain
@@ -153,37 +153,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5c27b1a4f5439be1d9cbf07c6c5e72aa, type: 3}
+  m_Script: {fileID: 11500000, guid: 7a7cc6ba1d00fbb08a56ed9e07bfd5d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  makeItFlat: 0
-  CoastlineTokens: 1900
-  limit: 2063
-  maxHeight: 0.5
-  smoothingAgentsNr: 1500
-  returnValue: 5
-  smoothingTokens: 4000
-  UseBeachAgents: 1
-  beachAgentsNr: 100
-  BeachTokens: 50
-  heighLimit: 0.01
-  randomWalkSize: 30
-  awayLimit: 3
-  beachHeight: 0.01
-  cityAgentsNr: 2
-  cityTokens: 10
-  distance: 10
-  cityAgent: {fileID: 1403033649334648429, guid: 7fa206b34e181281d93764ca27c7024d, type: 3}
+  cityAgentsNr: 5
+  cityTokens: 20
   roads: {fileID: 3089296634764339710, guid: f10b1ee675cddc8fabea24e911072996, type: 3}
-  splatHeights:
-  - textureIndex: 0
-    startingHeight: 0
-  - textureIndex: 1
-    startingHeight: 0.003
-  - textureIndex: 2
-    startingHeight: 0.01
+  palace: {fileID: 4104808338139126055, guid: d8b6324be2a50ea24b94d6069d4053c0, type: 3}
+  gap: 2
+  distance: 8
+  NumberOfHouse: 3
 --- !u!154 &77329740
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -236,7 +217,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -250, y: 0, z: -250}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -249,7 +230,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c73093679ca0a0c3aa714c6b58d9126a, type: 3}
   m_Name: 
@@ -265,7 +246,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8fb5d5a4266d9ff2d8bcfbc8a76a6244, type: 3}
   m_Name: 
@@ -280,7 +261,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3844b57e1120408690447fec59e7b33, type: 3}
   m_Name: 
@@ -299,7 +280,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 34b9b52151c45c40bada96c4f5a12005, type: 3}
   m_Name: 
@@ -479,8 +460,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.21462625, y: 0.0014547706, z: -0.00034660846, w: 0.9766951}
-  m_LocalPosition: {x: 15.662708, y: 234.9306, z: -425.22748}
+  m_LocalRotation: {x: 0.2539928, y: 0.0028830308, z: -0.000806806, w: 0.96720153}
+  m_LocalPosition: {x: 244.5224, y: 197.36475, z: -138.34915}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

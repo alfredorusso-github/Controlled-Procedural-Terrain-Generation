@@ -153,5 +153,25 @@ public class CommentedScript : MonoBehaviour
     //     }
     // }
 
+
+    // for(int k=0; k<points.Length; k++){
+
+        //     if(!start){
+        //         if(checkLocation(points[k], location) && !roadPoints.Contains(points[k])){
+        //             checkedPoints.Add(points[k]);
+        //         }
+        //     }
+        //     else{
+        //         if(checkLocation(points[k], location)){
+        //             checkedPoints.Add(points[k]);
+        //         }
+        //     }
+
+        //     // Debug.Log("PrevLocation: " + prevLocation + " Point: " + points[k].ToString() + " CheckPoint: " + chcekPoint(points[k], prevLocation));
+        // }
+
+        // if(checkedPoints.Count != 0){
+        //     return checkedPoints[0];
+        // }
         
 }

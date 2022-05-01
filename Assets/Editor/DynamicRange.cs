@@ -1,13 +1,13 @@
 using UnityEditor;
 
-[CustomEditor(typeof(CityAgentFlat))]
+[CustomEditor(typeof(CityAgent))]
 public class DynamicRange : Editor {
 
     public override void OnInspectorGUI(){
         
         base.OnInspectorGUI();
 
-        CityAgentFlat script = (CityAgentFlat)target;
+        CityAgent script = (CityAgent)target;
 
         script.NumberOfHouse = EditorGUILayout.IntSlider("Number Of House", script.NumberOfHouse, 1, script.maxNHouse);
     }
