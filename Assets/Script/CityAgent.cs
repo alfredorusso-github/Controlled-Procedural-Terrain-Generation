@@ -131,7 +131,7 @@ public class CityAgent : MonoBehaviour
 
         }
 
-        yield return new WaitForEndOfFrame();
+        yield return TreeAgent.Instance.Action();
     }
 
     private List<Vector2Int> getValidPoints()
