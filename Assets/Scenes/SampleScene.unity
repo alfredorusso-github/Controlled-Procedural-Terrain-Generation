@@ -237,8 +237,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   startingFromMapCenter: 1
-  CoastlineTokens: 100
-  VertexLimit: 1031
+  coastlineTokens: 100
+  vertexLimit: 1031
   maxHeight: 0.5
 --- !u!114 &77329744
 MonoBehaviour:
