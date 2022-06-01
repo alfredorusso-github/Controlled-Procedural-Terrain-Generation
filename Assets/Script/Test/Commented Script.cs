@@ -75,6 +75,23 @@ public class CommentedScript : MonoBehaviour
 
     //     return new Vector2(i, j);
     // }
+    
+    // private Vector2 getRepulsor(Vector2 attractor)
+    // {
+        // Vector2 attractorDirection = (attractor - _center).normalized;
+
+        // Calculating repulsor
+        // Vector2 repulsor = new Vector2(Random.Range(0, x), Random.Range(0, y));
+        // Vector2 repulsorDirection = (repulsor - _center).normalized;
+        //
+        // while (attractorDirection == repulsorDirection)
+        // {
+        //     repulsor = new Vector2(Random.Range(0, x), Random.Range(0, y));
+        //     repulsorDirection = (repulsor - _center).normalized;
+        // }
+        //
+    //     return repulsor;
+    // }
 
 
     //----------------------------- City Agent -----------------------------
