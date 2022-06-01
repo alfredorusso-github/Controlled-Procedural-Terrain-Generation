@@ -139,6 +139,7 @@ GameObject:
   - component: {fileID: 77329746}
   - component: {fileID: 77329739}
   - component: {fileID: 77329747}
+  - component: {fileID: 77329748}
   - component: {fileID: 77329745}
   m_Layer: 3
   m_Name: Terrain
@@ -154,7 +155,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a7cc6ba1d00fbb08a56ed9e07bfd5d6, type: 3}
   m_Name: 
@@ -236,7 +237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c73093679ca0a0c3aa714c6b58d9126a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingFromMapCenter: 1
+  startingFromMapCenter: 0
   CoastlineTokens: 100
   VertexLimit: 1031
   maxHeight: 0.5
@@ -299,7 +300,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 501519120d504024fb5b22ff190eac36, type: 3}
   m_Name: 
@@ -309,6 +310,23 @@ MonoBehaviour:
   ReturnValue: 5
   distance: 8
   tree: {fileID: 1512810094444040, guid: 4cde6ae520caf47bc9cefb7505852a96, type: 3}
+--- !u!114 &77329748
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 77329738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 377286a525380eb8ca1abbd72f263211, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agentNr: 3
+  token: 10
+  distance: 10
+  harborLenght: 15
+  harbor: {fileID: 8264897605011229832, guid: 60075a43993ec2748aff4de97b157dab, type: 3}
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

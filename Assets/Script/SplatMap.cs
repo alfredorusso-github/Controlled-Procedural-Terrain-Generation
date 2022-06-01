@@ -5,11 +5,11 @@ using UnityEngine;
 public class SplatMap : MonoBehaviour
 {
     //Terrain data
-    private Terrain terrain;
-    private TerrainData td;
-    private int x;
-    private int y;
-    private float [,] heightmap;
+    private Terrain _terrain;
+    private TerrainData _td;
+    private int _x;
+    private int _y;
+    private float [,] _heightmap;
 
     //SplatMap
     [System.Serializable]
@@ -37,31 +37,31 @@ public class SplatMap : MonoBehaviour
     void Start(){
 
         //Getting terrain information
-        terrain = GetComponent<Terrain> ();
-        td = terrain.terrainData;
-        x = td.heightmapResolution;
-        y = td.heightmapResolution;
+        _terrain = GetComponent<Terrain> ();
+        _td = _terrain.terrainData;
+        _x = _td.heightmapResolution;
+        _y = _td.heightmapResolution;
 
         //Initialize heighmap
-        heightmap = new float[x,y];
+        _heightmap = new float[_x,_y];
 
         // Flat all point
         flatAllPoints();
 
         // Change texture of the map to sea level
-        makeSplatMap();
+        MakeSplatMap();
     }
 
-    public void makeSplatMap(){
+    public void MakeSplatMap(){
 
-        heightmap = td.GetHeights(0, 0, x, y);
+        _heightmap = _td.GetHeights(0, 0, _x, _y);
 
-        float[, ,] splatMap = new float[td.alphamapHeight, td.alphamapWidth, td.alphamapLayers];
+        float[, ,] splatMap = new float[_td.alphamapHeight, _td.alphamapWidth, _td.alphamapLayers];
 
-        for(int y=0; y<td.alphamapHeight; y++){
-            for(int x=0; x<td.alphamapWidth; x++){
+        for(int y=0; y<_td.alphamapHeight; y++){
+            for(int x=0; x<_td.alphamapWidth; x++){
 
-                float height = heightmap[x, y];
+                float height = _heightmap[x, y];
 
                 float[] splat = new float[splatHeights.Length];
 
@@ -70,7 +70,7 @@ public class SplatMap : MonoBehaviour
                     if(i == splatHeights.Length - 1 && height >= splatHeights[i].startingHeight){
                         splat[i] = 1;
                     }
-                    else if(height >= splatHeights[i].startingHeight && height <= splatHeights[i+1].startingHeight){
+                    else if(height >= splatHeights[i].startingHeight && height < splatHeights[i+1].startingHeight){
                         splat[i] = 1;
                     }
                 }
@@ -81,16 +81,16 @@ public class SplatMap : MonoBehaviour
             }
         } 
 
-        td.SetAlphamaps(0, 0, splatMap);
+        _td.SetAlphamaps(0, 0, splatMap);
     }
 
     private void flatAllPoints(){
         
-        for(int i=0; i<x; i++){
-            for(int j=0; j<y; j++){
-                heightmap[i,j] = 0.0f;
+        for(int i=0; i<_x; i++){
+            for(int j=0; j<_y; j++){
+                _heightmap[i,j] = 0.0f;
             }
         }
-        td.SetHeights(0, 0, heightmap);
+        _td.SetHeights(0, 0, _heightmap);
     }
 }

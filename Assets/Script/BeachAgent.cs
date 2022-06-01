@@ -129,7 +129,7 @@ public class BeachAgent : MonoBehaviour
 
         Debug.Log("Finish generating beach...");
 
-        SplatMap.Instance.makeSplatMap();
+        SplatMap.Instance.MakeSplatMap();
     }
 
     private List<Vector2Int> getShorelinePoints(){
@@ -189,7 +189,7 @@ public class BeachAgent : MonoBehaviour
             return true;
         }
 
-       return false;
+        return false;
     } 
 
     private Vector2Int awayRandomPoint(Vector2Int position){
