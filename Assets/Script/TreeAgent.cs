@@ -96,7 +96,7 @@ public class TreeAgent : MonoBehaviour
         return hit.point;
     }
 
-    // Make the agent come back to the starting position is done in order to add details to a specific zone of the map, avoiding placing tree in a completing randomly manner
+    // Make the agent come back to the starting position is done in order to add details to a specific zone of the map, avoiding placing tree in a completing randomly way
     public IEnumerator Action()
     {
         heightmap = td.GetHeights(0, 0, x, y);
