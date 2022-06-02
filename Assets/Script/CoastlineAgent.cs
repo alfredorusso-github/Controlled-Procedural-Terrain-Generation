@@ -34,6 +34,8 @@ public class CoastlineAgent : MonoBehaviour
     public int vertexLimit;
     [Range(0.03f, 1.0f)] public float maxHeight;
     private Queue _agents;
+    private Vector2Int _center;
+    private bool _firstTime;
 
     // Directions vector
     private readonly Vector2Int[] _directions =
@@ -76,6 +78,8 @@ public class CoastlineAgent : MonoBehaviour
             return;
         }
 
+        _firstTime = true;
+        
         StartCoroutine(Action());
     }
 
@@ -101,6 +105,13 @@ public class CoastlineAgent : MonoBehaviour
             _ = (Agent)_agents.Dequeue();
             
             Vector2Int location = GetCoastlinePoints();
+
+            if (_firstTime)
+            {
+                _center = location;
+                _firstTime = false;
+                Debug.Log("Island center: " + _center);
+            }
 
             for (int i = 0; i < coastlineTokens; i++)
             {
@@ -205,8 +216,21 @@ public class CoastlineAgent : MonoBehaviour
 
     private Vector2 GetRepulsor(Vector2 attractor)
     {
-        return new Vector2((_x - 1) - attractor.x, (_y - 1) - attractor.y);
+        Vector2 attractorDirection = (attractor - _center).normalized;
+
+        //Calculating repulsor
+        Vector2 repulsor = new Vector2(Random.Range(0, _x), Random.Range(0, _y));
+        Vector2 repulsorDirection = (repulsor - _center).normalized;
+
+        while (attractorDirection == repulsorDirection)
+        {
+            repulsor = new Vector2(Random.Range(0, _x), Random.Range(0, _y));
+            repulsorDirection = (repulsor - _center).normalized;
+        }
+
+        return repulsor;
     }
+
 
     private float ScorePoint(Vector2 point, Vector2 attractor, Vector2 repulsor)
     {
