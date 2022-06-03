@@ -53,7 +53,7 @@ public class CoastlineAgent : MonoBehaviour
     // variable for testing
     private int _elevatedVertex;
 
-    void Start()
+    private void Start()
     {
         //Getting terrain information
         _terrain = GetComponent<Terrain>();
