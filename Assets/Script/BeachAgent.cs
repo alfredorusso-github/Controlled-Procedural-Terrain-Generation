@@ -114,7 +114,11 @@ public class BeachAgent : MonoBehaviour
                         
                     }
                     
-                    away = getNeighboringPoint(away);               
+                    away = getNeighboringPoint(away);
+                    if (away == -Vector2.one)
+                    {
+                        break;
+                    }
                 }
 
                 location = getNeighboringPoint(location);
@@ -170,6 +174,12 @@ public class BeachAgent : MonoBehaviour
     private Vector2Int getNeighboringPoint(Vector2Int location){
 
         List<Vector2Int> candidates = getNeighboringPoints(location);
+
+        if (candidates.Count == 0)
+        {
+            Debug.Log("Impossible to find an away point");
+            return -Vector2Int.one;
+        }
 
         return candidates[Random.Range(0, candidates.Count)];
     }

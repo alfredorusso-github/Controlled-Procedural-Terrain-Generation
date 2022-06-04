@@ -155,7 +155,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a7cc6ba1d00fbb08a56ed9e07bfd5d6, type: 3}
   m_Name: 
@@ -253,9 +253,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb5d5a4266d9ff2d8bcfbc8a76a6244, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smoothingAgentsNr: 2000
+  smoothingAgentsNr: 1500
   returnValue: 5
-  smoothingTokens: 4000
+  smoothingTokens: 3000
 --- !u!114 &77329745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -300,7 +300,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 501519120d504024fb5b22ff190eac36, type: 3}
   m_Name: 
