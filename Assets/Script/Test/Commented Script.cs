@@ -191,4 +191,22 @@ public class CommentedScript : MonoBehaviour
         //     return checkedPoints[0];
         // }
         
+        //----------------------------- Harbor Agent -----------------------------
+        
+        // while (!CheckLocation(location, candidates))
+        // {
+        //     location = NewLocation(location, attractor, repulsor);
+        //     
+        //     // Check if agent get stuck
+        //     if (location == -Vector2.one)
+        //     {
+        //         // move the agent to random coastline point
+        //         location = RandomPoint();
+        //         continue;
+        //     }
+        //     
+        //     _visitedPoint.Add(GetPoint(location));
+        //     _visitedLocation.Add(location);
+        // }
+        
 }

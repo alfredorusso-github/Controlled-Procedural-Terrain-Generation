@@ -65,7 +65,7 @@ public class TreeAgent : MonoBehaviour
         x = td.heightmapResolution;
         y = td.heightmapResolution;
 
-        //Initialize heighmap
+        //Initialize heightmap
         heightmap = new float[x, y];
     }
 
@@ -225,6 +225,12 @@ public class TreeAgent : MonoBehaviour
 
     private bool checkNearbyPoint(Vector2Int location)
     {
+        // Check if the location is inside the terrain
+        if (!(location.x >= 0 && location.x <= (x - 1)) || !(location.y >= 0 && location.y <= (y - 1)))
+        {
+            return false;
+        }
+
         if (!checkSteepness(location))
         {
             return false;
