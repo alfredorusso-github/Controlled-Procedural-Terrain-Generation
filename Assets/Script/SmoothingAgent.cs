@@ -7,11 +7,11 @@ public class SmoothingAgent : MonoBehaviour
 {
 
     //Terrain data
-    private Terrain terrain;
-    private TerrainData td;
-    private int x;
-    private int y;
-    private float [,] heightmap;
+    private Terrain _terrain;
+    private TerrainData _td;
+    private int _x;
+    private int _y;
+    private float [,] _heightmap;
 
     //Smoothing agent
     public int smoothingAgentsNr;
@@ -19,7 +19,7 @@ public class SmoothingAgent : MonoBehaviour
     public int smoothingTokens;
 
     // Neighboring Point
-    Vector2Int[] neighboringPoint = new Vector2Int[]{
+    private readonly Vector2Int[] _neighboringPoint = {
         Vector2Int.up,
         Vector2Int.down,
         Vector2Int.right,
@@ -44,19 +44,19 @@ public class SmoothingAgent : MonoBehaviour
     void Start(){
 
         //Getting terrain information
-        terrain = GetComponent<Terrain> ();
-        td = terrain.terrainData;
-        x = td.heightmapResolution;
-        y = td.heightmapResolution;
+        _terrain = GetComponent<Terrain> ();
+        _td = _terrain.terrainData;
+        _x = _td.heightmapResolution;
+        _y = _td.heightmapResolution;
 
         //Initialize heighmap
-        heightmap = new float[x,y];        
+        _heightmap = new float[_x,_y];        
     }
 
     public IEnumerator Action(){  
 
-        heightmap = td.GetHeights(0, 0, x ,y);
-        List<Vector2Int> pointsToSmooth = getStartingPoint();
+        _heightmap = _td.GetHeights(0, 0, _x ,_y);
+        List<Vector2Int> pointsToSmooth = GetStartingPoint();
 
         Debug.Log("Starting smoothing...");
 
@@ -78,14 +78,14 @@ public class SmoothingAgent : MonoBehaviour
 
                     //adjusting the value of the point in position location
                     float newHeight = VonNeumannNeighborhood(location);
-                    heightmap[location.y, location.x] = newHeight;
+                    _heightmap[location.y, location.x] = newHeight;
 
-                    location = getNeighboringPoint(location);
+                    location = GetNeighboringPoint(location);
                     count++;
                 }
             }
             
-            td.SetHeights(0, 0, heightmap);
+            _td.SetHeights(0, 0, _heightmap);
             yield return new WaitForEndOfFrame();
         }
 
@@ -96,13 +96,13 @@ public class SmoothingAgent : MonoBehaviour
         yield return BeachAgent.Instance.Action();
     }
 
-    private List<Vector2Int> getStartingPoint(){
+    private List<Vector2Int> GetStartingPoint(){
         
         List<Vector2Int> pointsToSmooth = new List<Vector2Int>(); 
 
-        for (int i = 0; i < x; i++){
-            for (int j = 0; j < y; j++){
-                if(heightmap[j, i] != 0){
+        for (int i = 0; i < _x; i++){
+            for (int j = 0; j < _y; j++){
+                if(_heightmap[j, i] != 0){
                     pointsToSmooth.Add(new Vector2Int(i, j));
                 }
             }
@@ -124,7 +124,7 @@ public class SmoothingAgent : MonoBehaviour
         float surroundingWeight = 11.0f/9.0f;
         float beyondSurroundingWeight = 11.0f/18.0f;
 
-        float centralPointHeight = heightmap[position.y, position.x]; 
+        float centralPointHeight = _heightmap[position.y, position.x]; 
 
         Vector2Int [] surroundingPoints = new Vector2Int[] {
             position + Vector2Int.right,
@@ -142,8 +142,8 @@ public class SmoothingAgent : MonoBehaviour
 
         for(int i=0; i<surroundingPoints.Length; i++){
             
-            if( checkLimit(surroundingPoints[i]) ){
-                heights[i] = heightmap[surroundingPoints[i].y, surroundingPoints[i].x];
+            if( CheckLimit(surroundingPoints[i]) ){
+                heights[i] = _heightmap[surroundingPoints[i].y, surroundingPoints[i].x];
             }
             else{
                 heights[i] = 0;
@@ -165,12 +165,12 @@ public class SmoothingAgent : MonoBehaviour
         return num/denom;
     }
 
-    private Vector2Int getNeighboringPoint(Vector2Int position){
+    private Vector2Int GetNeighboringPoint(Vector2Int position){
 
         // if the agents never move itself outside the maps, the list will always have at least three point inside
         List<Vector2Int> check = new List<Vector2Int>();
-        foreach(Vector2Int point in neighboringPoint){
-            if((checkLimit(position + point))){
+        foreach(Vector2Int point in _neighboringPoint){
+            if((CheckLimit(position + point))){
                 check.Add(position + point);
             }
         }
@@ -178,8 +178,8 @@ public class SmoothingAgent : MonoBehaviour
         return check[Random.Range(0, check.Count)];
     }
 
-    private bool checkLimit(Vector2Int point){
-        if(point.x > 0 && point.x < x && point.y > 0 && point.y < y){
+    private bool CheckLimit(Vector2Int point){
+        if(point.x > 0 && point.x < _x && point.y > 0 && point.y < _y){
             return true;
         }
 
