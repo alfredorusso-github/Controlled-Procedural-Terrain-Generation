@@ -184,7 +184,7 @@ public class CoastlineAgent : MonoBehaviour
         foreach (Vector2Int point in _directions)
         {
             Vector2Int tmp = point + location;
-            if (_heightmap[tmp.y, tmp.x] == 0)
+            if (CheckLimit(tmp) && _heightmap[tmp.y, tmp.x] == 0)
             {
                 return true;
             }
