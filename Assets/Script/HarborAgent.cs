@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using JetBrains.Annotations;
 using UnityEngine;
 
 [RequireComponent(typeof(Terrain))]
@@ -16,6 +15,7 @@ public class HarborAgent : MonoBehaviour
     // Agent data
     public int agentNr;
     public int token;
+    public int timesSearchingPoint;
     [Range(5, 50)] public int distance;
     [Range(5, 15)] public int harborLenght;
     
@@ -87,19 +87,26 @@ public class HarborAgent : MonoBehaviour
         // List used for keeping truck already visited point for a single agent
         _visitedLocation = new List<Vector2>();
         
+        Debug.Log("Starting placing Harbors");
+        
         for (int i = 0; i < agentNr; i++)
         {
-            // Check if the point is a valid one in order to place the harbor
             List<Vector2> candidates = new List<Vector2>();
-            Vector2 location = RandomPoint();
-            while (!CheckLocation(location, candidates))
+            
+            // Place agent on a coastline point
+            Vector2 location = GetStartingPoint(candidates);
+            
+            // The agent can't find a point where it is possible to place the harbor
+            if (location == -Vector2.one)
             {
-                location = RandomPoint();
+                Debug.Log("No more point available where to place harbor...");
+                break;
             }
+            
+            //Place the harbor
             PlaceHarbor(location, candidates);
             Physics.SyncTransforms();
-            Debug.Log("Starting Point: " + location);
-            
+
             // variable used for scoring point in order to have the agent moving in a certain direction 
             Vector2 attractor = GetAttractor();
             Vector2 repulsor = GetRepulsor(attractor, location);
@@ -108,14 +115,45 @@ public class HarborAgent : MonoBehaviour
             {
                 // Move agent to the new location and place harbor
                 location = FindNewLocation(location, attractor, repulsor);
+                
+                // No location was found
+                if (location == -Vector2.one)
+                {
+                    Debug.Log("No more point available where to place harbor...");
+                    location = RandomPoint();
+                }
             }
             
             _visitedLocation.Clear();
+
+            yield return new WaitForEndOfFrame();
         }
 
         Debug.Log("Visited point: " + _visitedPoint.Count);
 
         yield return new WaitForEndOfFrame();
+
+        GameObject[] harbors = GameObject.FindGameObjectsWithTag("Harbor");
+        Debug.Log("Number of harbor placed: " + harbors.Length);
+        
+        Debug.Log("Finished placing harbors...");
+    }
+
+    private Vector2 GetStartingPoint(List<Vector2> candidates)
+    {
+        Vector2 location = RandomPoint();
+
+        for (int i = 0; i < timesSearchingPoint; i++)
+        {
+            if (CheckLocation(location, candidates))
+            {
+                return location;
+            }
+
+            location = RandomPoint();
+        }
+        
+        return -Vector2.one;
     }
 
     private Vector2 FindNewLocation(Vector2 location, Vector2 attractor, Vector2 repulsor)
@@ -128,11 +166,12 @@ public class HarborAgent : MonoBehaviour
             // Agent get stuck
             if (location == -Vector2.one)
             {
+                _visitedLocation.Clear();
                 location = RandomPoint();
-                // _locations.Add(GetPoint(location));
                 break;
             }
-                    
+            
+            // Debug
             if (k == distance - 1)
             {
                 _visitedLocation.Add(location);
@@ -144,27 +183,28 @@ public class HarborAgent : MonoBehaviour
         
         // Check if the location has a valid directions where to place harbor otherwise agent continue walking until it will find valid point or get stuck
         List<Vector2> candidates = new List<Vector2>();
-        while (!CheckLocation(location, candidates))
+
+        for (int i = 0; i < timesSearchingPoint; i++)
         {
+            if (CheckLocation(location, candidates))
+            {
+                PlaceHarbor(location, candidates);
+                Physics.SyncTransforms();
+                return location;
+            }
+        
             location = NewLocation(location, attractor, repulsor);
-            
-            // Check if agent get stuck
+        
             if (location == -Vector2.one)
             {
-                // move the agent to random coastline point
                 location = RandomPoint();
-                continue;
             }
             
             _visitedPoint.Add(GetPoint(location));
             _visitedLocation.Add(location);
         }
         
-        //Place harbor
-        PlaceHarbor(location, candidates);
-        Physics.SyncTransforms();
-
-        return location;
+        return -Vector2.one;
     }
     
     private Vector2 NewLocation(Vector2 location, Vector2 attractor, Vector2 repulsor)
@@ -360,6 +400,8 @@ public class HarborAgent : MonoBehaviour
     
     private void PlaceHarbor(Vector2 location, List<Vector2> candidates)
     {
+        //Debug
+        DrawDir(location, candidates);
         _locations.Add(GetPoint(location));
         
         Vector3 worldLocation = GetPoint(location);
