@@ -253,7 +253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb5d5a4266d9ff2d8bcfbc8a76a6244, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smoothingAgentsNr: 1500
+  smoothingAgentsNr: 2000
   returnValue: 5
   smoothingTokens: 3000
 --- !u!114 &77329745
@@ -288,8 +288,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beachAgentsNr: 100
-  BeachTokens: 50
-  heighLimit: 0.01
+  beachTokens: 50
+  heightLimit: 0.01
   randomWalkSize: 30
   awayLimit: 3
   beachHeight: 0.01

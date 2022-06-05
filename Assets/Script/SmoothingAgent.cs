@@ -126,7 +126,7 @@ public class SmoothingAgent : MonoBehaviour
 
         float centralPointHeight = _heightmap[position.y, position.x]; 
 
-        Vector2Int [] surroundingPoints = new Vector2Int[] {
+        Vector2Int [] surroundingPoints = {
             position + Vector2Int.right,
             position + Vector2Int.left, 
             position + Vector2Int.up, 
@@ -146,7 +146,7 @@ public class SmoothingAgent : MonoBehaviour
                 heights[i] = _heightmap[surroundingPoints[i].y, surroundingPoints[i].x];
             }
             else{
-                heights[i] = 0;
+                heights[i] = _heightmap[position.y, position.x];
             }            
         }
 
@@ -179,7 +179,7 @@ public class SmoothingAgent : MonoBehaviour
     }
 
     private bool CheckLimit(Vector2Int point){
-        if(point.x > 0 && point.x < _x && point.y > 0 && point.y < _y){
+        if(point.x >= 0 && point.x < _x && point.y >= 0 && point.y < _y){
             return true;
         }
 
