@@ -1,7 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using System.Linq;
+using TMPro;
+using UnityEngine;
 
 [RequireComponent(typeof(Terrain))]
 public class CoastlineAgent : MonoBehaviour
@@ -9,15 +10,22 @@ public class CoastlineAgent : MonoBehaviour
     private readonly struct Agent
     {
         private readonly int _vertex;
+        private readonly Vector2 _direction;
 
-        public Agent(int vertex)
+        public Agent(int vertex, Vector2 direction)
         {
             _vertex = vertex;
+            _direction = direction;
         }
 
         public int GetVertex()
         {
             return _vertex;
+        }
+
+        public Vector2 GetDirection()
+        {
+            return _direction;
         }
     }
 
@@ -34,20 +42,21 @@ public class CoastlineAgent : MonoBehaviour
     public int vertexLimit;
     [Range(0.03f, 1.0f)] public float maxHeight;
     private Queue _agents;
-    private Vector2Int _center;
+    private Vector2 _center;
     private bool _firstTime;
+    private HashSet<Vector2> _coastlinePoints;
 
     // Directions vector
-    private readonly Vector2Int[] _directions =
+    private readonly Vector2[] _directions =
     {
-        Vector2Int.up,
-        Vector2Int.down,
-        Vector2Int.right,
-        Vector2Int.left,
-        Vector2Int.one,
-        -Vector2Int.one,
-        new Vector2Int(1, -1),
-        new Vector2Int(-1, 1)
+        Vector2.up,
+        Vector2.down,
+        Vector2.right,
+        Vector2.left,
+        Vector2.one,
+        -Vector2.one,
+        new Vector2(1, -1),
+        new Vector2(-1, 1)
     };
 
     // variable for testing
@@ -63,12 +72,15 @@ public class CoastlineAgent : MonoBehaviour
 
         //Initialize heightmap
         _heightmap = new float[_x, _y];
-
+       
         // Initialize Queue
         _agents = new Queue();
-
+        
+        // Initialize coastline point list
+        _coastlinePoints = new HashSet<Vector2>();
+        
         // Instantiate first agent
-        Agent agent = new Agent((_x - 1) * (_y - 1));
+        Agent agent = new Agent((_x - 1) * (_y - 1), _directions[Random.Range(0, _directions.Length)]);
         GetCoastlineAgents(agent);
         Debug.Log("Number of agents: " + _agents.Count);
 
@@ -83,13 +95,18 @@ public class CoastlineAgent : MonoBehaviour
         StartCoroutine(Action());
     }
 
+    public HashSet<Vector2> CoastlinePoints()
+    {
+        return _coastlinePoints;
+    }
+
     private void GetCoastlineAgents(Agent agent)
     {
         if (agent.GetVertex() >= vertexLimit)
         {
             for (int i = 0; i < 2; i++)
             {
-                GetCoastlineAgents(new Agent(agent.GetVertex() / 2));
+                GetCoastlineAgents(new Agent(agent.GetVertex() / 2, Random.insideUnitCircle.normalized));
             }
         }
         else
@@ -102,39 +119,32 @@ public class CoastlineAgent : MonoBehaviour
     {
         while (_agents.Count != 0)
         {
-            _ = (Agent)_agents.Dequeue();
+            Agent agent = (Agent)_agents.Dequeue();
             
-            Vector2Int location = GetCoastlinePoints();
+            Vector2 location = GetCoastlinePoints();
 
             if (_firstTime)
             {
                 _center = location;
                 _firstTime = false;
+                _coastlinePoints.Add(location);
                 Debug.Log("Island center: " + _center);
             }
 
             for (int i = 0; i < coastlineTokens; i++)
             {
-                // Points to score
-                List<Vector2Int> candidates = NearPoints(location);
+                List<Vector2> candidates = NearPoints(location);
 
                 while (candidates.Count == 0)
                 {
-                    location = GetCoastlinePoints();
+                    location = FindCoastlinePoint(agent);
                     candidates = NearPoints(location);
                 }
 
-                List<float> scores = new List<float>();
+                location = candidates[Random.Range(0, candidates.Count)];
+                _coastlinePoints.Add(location);
 
-                foreach (Vector2Int candidate in candidates)
-                {
-                    Vector2 attractor = GetAttractor();
-                    Vector2 repulsor = GetRepulsor(attractor);
-                    scores.Add(ScorePoint(candidate, attractor, repulsor));
-                }
-
-                location = candidates[scores.IndexOf(scores.Max())];
-                _heightmap[location.y, location.x] = Random.Range(.02f, maxHeight);
+                _heightmap[(int) location.y, (int) location.x] = Random.Range(.02f, maxHeight);
                 _elevatedVertex++;
             }
 
@@ -145,46 +155,85 @@ public class CoastlineAgent : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         Debug.Log("Vertex Elevated: " + _elevatedVertex);
+        
+        Debug.Log(_coastlinePoints.Count != _coastlinePoints.Distinct().ToList().Count);
 
         yield return SmoothingAgent.Instance.Action();
     }
-
-    private Vector2Int GetCoastlinePoints()
+    
+    private Vector2 FindCoastlinePoint(Agent agent)
     {
-        List<Vector2Int> coastlinePoints = new List<Vector2Int>();
+        Vector2 startingLocation = RandomPoint();
+        Vector2 location = startingLocation;
+        
+        
+        // Check if the direction not lead to a point outside the map
+        for (int i = 0; i < _x/2; i++)
+        {
+            if (IsInsideTerrain(location) && CheckNearPoint(location) && _heightmap[(int) location.y,  (int) location.x] != 0)
+            {
+                return location;
+            }
 
+            location += agent.GetDirection();
+        }
+        
+        // if here means the direction lead outside the map, change it
+        location = startingLocation;
+        for (int i = 0; i < _x/2; i++)
+        {
+            if (CheckNearPoint(location) && _heightmap[(int) location.y,  (int) location.x] != 0)
+            {
+                return location;
+            }
+
+            location += - agent.GetDirection();
+        }
+
+        return location;
+    }
+
+    private Vector2 RandomPoint()
+    {
+        return _coastlinePoints.ElementAt(Random.Range(0, _coastlinePoints.Count));
+    }
+
+    private Vector2 GetCoastlinePoints()
+    {
+        List<Vector2> coastlinePoints = new List<Vector2>();
+    
         for (int i = 0; i < _x; i++)
         {
             for (int j = 0; j < _y; j++)
             {
-                Vector2Int tmp = new Vector2Int(i, j);
-                if (_heightmap[tmp.y, tmp.x] != 0 && CheckNearPoint(tmp))
+                Vector2 tmp = new Vector2(i, j);
+                if (CheckNearPoint(tmp) && _heightmap[(int) tmp.y, (int) tmp.x] != 0)
                 {
                     coastlinePoints.Add(tmp);
                 }
             }
         }
-
+    
         if (coastlinePoints.Count != 0)
         {
             return coastlinePoints[Random.Range(0, coastlinePoints.Count)];
         }
-
+    
         // If here means that the first agent is placed on the terrain
         if (!startingFromMapCenter)
         {
-            return new Vector2Int(Random.Range(0, _x), Random.Range(0, _y));
+            return new Vector2(Random.Range(0, _x), Random.Range(0, _y));
         }
-
-        return new Vector2Int(_x / 2, _y / 2);
+    
+        return new Vector2(_x / 2, _y / 2);
     }
 
-    private bool CheckNearPoint(Vector2Int location)
+    private bool CheckNearPoint(Vector2 location)
     {
-        foreach (Vector2Int point in _directions)
+        foreach (Vector2 point in _directions)
         {
-            Vector2Int tmp = point + location;
-            if (CheckLimit(tmp) && _heightmap[tmp.y, tmp.x] == 0)
+            Vector2 tmp = point + location;
+            if (IsInsideTerrain(tmp) && _heightmap[(int) tmp.y, (int) tmp.x] == 0)
             {
                 return true;
             }
@@ -193,14 +242,14 @@ public class CoastlineAgent : MonoBehaviour
         return false;
     }
 
-    private List<Vector2Int> NearPoints(Vector2Int location)
+    private List<Vector2> NearPoints(Vector2 location)
     {
-        List<Vector2Int> nearestPoints = new List<Vector2Int>();
+        List<Vector2> nearestPoints = new List<Vector2>();
 
-        foreach (Vector2Int point in _directions)
+        foreach (Vector2 point in _directions)
         {
-            Vector2Int tmp = location + point;
-            if (CheckLimit(tmp) && _heightmap[tmp.y, tmp.x] == 0)
+            Vector2 tmp = location + point;
+            if (IsInsideTerrain(tmp) && _heightmap[(int) tmp.y, (int) tmp.x] == 0)
             {
                 nearestPoints.Add(tmp);
             }
@@ -209,58 +258,9 @@ public class CoastlineAgent : MonoBehaviour
         return nearestPoints;
     }
 
-    private Vector2 GetAttractor()
+    private bool IsInsideTerrain(Vector2 point)
     {
-        return new Vector2(Random.Range(0, _x), Random.Range(0, _y));
-    }
-
-    private Vector2 GetRepulsor(Vector2 attractor)
-    {
-        Vector2 attractorDirection = (attractor - _center).normalized;
-
-        //Calculating repulsor
-        Vector2 repulsor = new Vector2(Random.Range(0, _x), Random.Range(0, _y));
-        Vector2 repulsorDirection = (repulsor - _center).normalized;
-
-        while (attractorDirection == repulsorDirection)
-        {
-            repulsor = new Vector2(Random.Range(0, _x), Random.Range(0, _y));
-            repulsorDirection = (repulsor - _center).normalized;
-        }
-
-        return repulsor;
-    }
-
-
-    private float ScorePoint(Vector2 point, Vector2 attractor, Vector2 repulsor)
-    {
-        float result = Mathf.Pow(Vector2.Distance(point, repulsor), 2.0f) -
-                       Mathf.Pow(Vector2.Distance(point, attractor), 2.0f) +
-                       (3 * Mathf.Pow(GetClosestDistance(point), 2.0f));
-        return result;
-    }
-
-    private float GetClosestDistance(Vector2 point)
-    {
-        //Order of the point inside the array to respect the Point point received from input: left, right, up, down 
-        Vector2[] borderPoints =
-        {
-            new Vector2(0, point.y), new Vector2(_x, point.y),
-            new Vector2(point.x, _y), new Vector2(point.x, 0)
-        };
-
-        float[] result = new float[borderPoints.Length];
-        for (int i = 0; i < result.Length; i++)
-        {
-            result[i] = Vector2.Distance(point, borderPoints[i]);
-        }
-
-        return result.OrderBy(a => a).ToArray()[0];
-    }
-
-    private bool CheckLimit(Vector2Int point)
-    {
-        if (point.x >= 0 && point.x <= _x - 1 && point.y >= 0 && point.y <= _y - 1)
+        if (point.x >= 0 && point.x < _x  && point.y >= 0 && point.y < _y)
         {
             return true;
         }

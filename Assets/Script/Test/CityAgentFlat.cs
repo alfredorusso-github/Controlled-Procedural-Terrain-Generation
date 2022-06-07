@@ -10,8 +10,8 @@ public class CityAgentFlat : MonoBehaviour
     private TerrainData td;
     private int x;
     private int y;
-    private float [,] heightmap;
-    private float [,] tmpHeightMap;
+    private float[,] heightmap;
+    private float[,] tmpHeightMap;
 
     //City agent
     public int cityAgentsNr;
@@ -20,50 +20,55 @@ public class CityAgentFlat : MonoBehaviour
     public GameObject palace = null;
     public int gap;
     [Range(5, 20)] public int distance;
-    public int maxNHouse{
-        get{
-            if(gap == 1){
-                return (distance/gap) - 2;
+
+    public int maxNHouse
+    {
+        get
+        {
+            if (gap == 1)
+            {
+                return (distance / gap) - 2;
             }
-            return (distance/gap) - 1;
+
+            return (distance / gap) - 1;
         }
     }
-    [HideInInspector]
-    public int NumberOfHouse = 1;
+
+    [HideInInspector] public int NumberOfHouse = 1;
 
     // Start is called before the first frame update
-    void Start(){
-        
+    void Start()
+    {
         //Getting terrain information
-        terrain = GetComponent<Terrain> ();
+        terrain = GetComponent<Terrain>();
         td = terrain.terrainData;
         x = td.heightmapResolution;
         y = td.heightmapResolution;
 
         //Inizialize heighmap
-        heightmap = new float[x,y];
+        heightmap = new float[x, y];
 
-        StartCoroutine(cityActionCoroutine());     
+        StartCoroutine(cityActionCoroutine());
     }
 
-    private IEnumerator cityActionCoroutine(){
-
+    private IEnumerator cityActionCoroutine()
+    {
         List<Vector2> roadPoints = new List<Vector2>();
 
         // Getting terrain position
         Vector3 pos = terrain.GetPosition();
 
-        for(int i=0; i<cityAgentsNr; i++){
-
+        for (int i = 0; i < cityAgentsNr; i++)
+        {
             Vector2 location = getStartingPoint();
             // roadPoints.Add(location);
-            
+
             Vector2 prevLocation = location;
             location = getNewLocation(location, prevLocation, roadPoints);
             // roadPoints.Add(location);
 
-            for(int j=0; j<cityTokens; j++){
-                
+            for (int j = 0; j < cityTokens; j++)
+            {
                 // Debug.Log("PrevLocation: " + prevLocation + " Location: " + location);
 
                 createRoad(location, prevLocation, pos);
@@ -74,108 +79,116 @@ public class CityAgentFlat : MonoBehaviour
 
                 Vector2 tmp = location;
                 location = getNewLocation(location, prevLocation, roadPoints, false);
-                if(location == tmp){
+                if (location == tmp)
+                {
                     break;
                 }
+
                 roadPoints.Add(location);
                 prevLocation = tmp;
             }
         }
     }
 
-    private Vector2 getStartingPoint(){
-        return new Vector2(Random.Range(1, x-2), Random.Range(1, y-2));
+    private Vector2 getStartingPoint()
+    {
+        return new Vector2(Random.Range(1, x - 2), Random.Range(1, y - 2));
     }
 
-    private void createPalace(Vector2 location, Vector2 prevLocation, Vector3 pos){
-
+    private void createPalace(Vector2 location, Vector2 prevLocation, Vector3 pos)
+    {
         Vector3 worldLocation = new Vector3(location.x + pos.x, 0.05f, location.y + pos.z);
         Vector3 prevWorldLocation = new Vector3(prevLocation.x + pos.x, 0.05f, prevLocation.y + pos.z);
 
-        Vector3 dir = (worldLocation - prevWorldLocation).normalized; 
+        Vector3 dir = (worldLocation - prevWorldLocation).normalized;
 
         // Debug.Log("WorldLocation: " + worldLocation + " Prev: " + prevWorldLocation + " Direction: " + dir + " Cross with Vector3.up: " + Vector3.Cross(dir, Vector3.up));
 
         Vector3 palace_pos = Vector3.Lerp(worldLocation, prevWorldLocation, 0.5f);
-        Quaternion rot_palace = Quaternion.LookRotation(Vector3.Cross(dir,Vector3.up), Vector3.up);
+        Quaternion rot_palace = Quaternion.LookRotation(Vector3.Cross(dir, Vector3.up), Vector3.up);
 
-        var pal = Instantiate(palace, palace_pos , rot_palace);
+        var pal = Instantiate(palace, palace_pos, rot_palace);
         pal.transform.Translate(Vector3.up * 0.5f);
         pal.transform.Translate(-Vector3.forward);
         pal.AddComponent<RayCaster>();
 
-        if(NumberOfHouse == 1){
+        if (NumberOfHouse == 1)
+        {
             return;
         }
 
         Vector3 pos_right = palace_pos;
         Vector3 pos_left = palace_pos;
 
-        for(int i=0; i<NumberOfHouse-1; i++){
-
-            if(i % 2 == 0){
+        for (int i = 0; i < NumberOfHouse - 1; i++)
+        {
+            if (i % 2 == 0)
+            {
                 pos_right += dir * gap;
                 pal = Instantiate(palace, pos_right, rot_palace);
                 pal.transform.Translate(Vector3.up * 0.5f);
                 pal.transform.Translate(-Vector3.forward);
                 pal.AddComponent<RayCaster>();
             }
-            else{
+            else
+            {
                 pos_left -= dir * gap;
                 pal = Instantiate(palace, pos_left, rot_palace);
                 pal.transform.Translate(Vector3.up * 0.5f);
                 pal.transform.Translate(-Vector3.forward);
                 pal.AddComponent<RayCaster>();
             }
-
         }
     }
 
-    private void createRoad(Vector2 location, Vector2 prevLocation, Vector3 pos){
-        
+    private void createRoad(Vector2 location, Vector2 prevLocation, Vector3 pos)
+    {
         Vector3 worldLocation = new Vector3(location.x + pos.x, 0.05f, location.y + pos.y);
         Vector3 prevWorldLocation = new Vector3(prevLocation.x + pos.x, 0.05f, prevLocation.y + pos.y);
 
-        Vector3 dir = (worldLocation - prevWorldLocation).normalized; 
+        Vector3 dir = (worldLocation - prevWorldLocation).normalized;
 
         float length = Vector3.Distance(worldLocation, prevWorldLocation);
         Quaternion rot_road = Quaternion.LookRotation(dir, Vector3.up);
         Vector3 scale_road = new Vector3(1.0f, 1.0f, length);
 
         var road = Instantiate(roads, worldLocation, rot_road);
-        road.transform.Translate(-Vector3.forward * (length + 1.0f)  * 0.5f);
+        road.transform.Translate(-Vector3.forward * (length + 1.0f) * 0.5f);
         road.transform.localScale = scale_road;
     }
 
-    private Vector2 getNewLocation(Vector2 location, Vector2 prevLocation, List<Vector2> roadPoints, bool start = true){
-
+    private Vector2 getNewLocation(Vector2 location, Vector2 prevLocation, List<Vector2> roadPoints, bool start = true)
+    {
         Vector2[] points;
-        if(start){
+        if (start)
+        {
             points = getPointsStart(location);
         }
-        else{
+        else
+        {
             points = getPoints(location, prevLocation);
         }
 
         List<Vector2> checkedPoints = new List<Vector2>();
 
-        for(int k=0; k<points.Length; k++){
-
-            if(checkLocation(points[k], location)){
+        for (int k = 0; k < points.Length; k++)
+        {
+            if (checkLocation(points[k], location))
+            {
                 checkedPoints.Add(points[k]);
             }
-
         }
 
-        if(checkedPoints.Count != 0){
+        if (checkedPoints.Count != 0)
+        {
             return checkedPoints[0];
         }
 
         return location;
     }
 
-    private Vector2[] getPoints(Vector2 location, Vector2 prevLocation){
-        
+    private Vector2[] getPoints(Vector2 location, Vector2 prevLocation)
+    {
         Vector2 dir = (location - prevLocation).normalized;
         Vector2 perpendicularDir = Vector2.Perpendicular(dir);
 
@@ -188,9 +201,10 @@ public class CityAgentFlat : MonoBehaviour
         return shuffle(points);
     }
 
-    private Vector2[] getPointsStart(Vector2 location){
-
-        Vector2[] points = new Vector2[]{
+    private Vector2[] getPointsStart(Vector2 location)
+    {
+        Vector2[] points = new Vector2[]
+        {
             location + Vector2.down * distance,
             location + Vector2.up * distance,
             location + Vector2.right * distance,
@@ -203,10 +217,11 @@ public class CityAgentFlat : MonoBehaviour
     // @param
     // location = k
     // prevLocation = location
-    private bool checkLocation(Vector2 location, Vector2 prevLocation){
-
+    private bool checkLocation(Vector2 location, Vector2 prevLocation)
+    {
         // Check if the location is inside the terrain
-        if( !(location.x >= 0 && location.x <= (x-2)) || !(location.y >= 0 && location.y <= (y-2)) ){
+        if (!(location.x >= 0 && location.x <= (x - 2)) || !(location.y >= 0 && location.y <= (y - 2)))
+        {
             return false;
         }
 
@@ -226,46 +241,54 @@ public class CityAgentFlat : MonoBehaviour
         // In order to not check the points near the prevLocation(location, not k)
         prevLocation += dir;
 
-        for(int i=0; i<dist-1; i++){
-
+        for (int i = 0; i < dist - 1; i++)
+        {
             Vector2 right = prevLocation + perpendicularDir;
             Vector2 right2 = prevLocation + perpendicularDir * 2;
 
             Vector2 left = prevLocation - perpendicularDir;
             Vector2 left2 = prevLocation - perpendicularDir * 2;
 
-            bool isHit1 = Physics.Raycast(new Vector3(right.x , 80.0f, right.y), Vector3.down, out hit1, Mathf.Infinity);
-            bool isHit2 = Physics.Raycast(new Vector3(right2.x , 80.0f, right2.y), Vector3.down, out hit2, Mathf.Infinity);
-            if( isHit1 && isHit2 ){
-                if( (hit1.collider.name == "Quad") != (hit2.collider.name == "Quad") ){
+            bool isHit1 = Physics.Raycast(new Vector3(right.x, 80.0f, right.y), Vector3.down, out hit1, Mathf.Infinity);
+            bool isHit2 = Physics.Raycast(new Vector3(right2.x, 80.0f, right2.y), Vector3.down, out hit2,
+                Mathf.Infinity);
+            if (isHit1 && isHit2)
+            {
+                if ((hit1.collider.name == "Quad") != (hit2.collider.name == "Quad"))
+                {
                     return false;
                 }
             }
 
-            isHit1 = Physics.Raycast(new Vector3(left.x , 80.0f, left.y), Vector3.down, out hit1, Mathf.Infinity);
-            isHit2 = Physics.Raycast(new Vector3(left2.x , 80.0f, left2.y), Vector3.down, out hit2, Mathf.Infinity);
-            if( isHit1 && isHit2 ){
-                if( (hit1.collider.name == "Quad") != (hit2.collider.name == "Quad") ){
+            isHit1 = Physics.Raycast(new Vector3(left.x, 80.0f, left.y), Vector3.down, out hit1, Mathf.Infinity);
+            isHit2 = Physics.Raycast(new Vector3(left2.x, 80.0f, left2.y), Vector3.down, out hit2, Mathf.Infinity);
+            if (isHit1 && isHit2)
+            {
+                if ((hit1.collider.name == "Quad") != (hit2.collider.name == "Quad"))
+                {
                     return false;
                 }
             }
 
             // Check if along the direction where will be placed the road, there is already another road
-            isHit1 = Physics.Raycast(new Vector3(prevLocation.x , 80.0f, prevLocation.y), Vector3.down, out hit1, Mathf.Infinity); 
-            if(isHit1){
-                if(hit1.collider.name == "Quad"){
+            isHit1 = Physics.Raycast(new Vector3(prevLocation.x, 80.0f, prevLocation.y), Vector3.down, out hit1,
+                Mathf.Infinity);
+            if (isHit1)
+            {
+                if (hit1.collider.name == "Quad")
+                {
                     return false;
                 }
             }
 
             prevLocation += dir;
-
         }
 
         return true;
     }
 
-    private Vector2[] shuffle(Vector2[] array){
+    private Vector2[] shuffle(Vector2[] array)
+    {
         System.Random r = new System.Random();
 
         array = array.OrderBy(x => r.Next()).ToArray();

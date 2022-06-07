@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class RayCaster : MonoBehaviour
 {
-
-    void OnDrawGizmos(){
-        RaycastHit hit; 
+    void OnDrawGizmos()
+    {
+        RaycastHit hit;
 
         Physics.Raycast(transform.position, transform.forward, out hit, Mathf.Infinity);
 

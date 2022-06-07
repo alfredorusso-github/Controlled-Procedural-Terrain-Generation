@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [RequireComponent(typeof(Terrain))]
@@ -17,6 +18,7 @@ public class SmoothingAgent : MonoBehaviour
     public int smoothingAgentsNr;
     public int returnValue;
     public int smoothingTokens;
+    private HashSet<Vector2> _coastlinePoints;
 
     // Neighboring Point
     private readonly Vector2Int[] _neighboringPoint = {
@@ -49,20 +51,21 @@ public class SmoothingAgent : MonoBehaviour
         _x = _td.heightmapResolution;
         _y = _td.heightmapResolution;
 
-        //Initialize heighmap
-        _heightmap = new float[_x,_y];        
+        //Initialize heightmap
+        _heightmap = new float[_x, _y];
+
+        _coastlinePoints = FindObjectOfType<CoastlineAgent>().CoastlinePoints();
     }
 
     public IEnumerator Action(){  
 
         _heightmap = _td.GetHeights(0, 0, _x ,_y);
-        List<Vector2Int> pointsToSmooth = GetStartingPoint();
 
         Debug.Log("Starting smoothing...");
 
         for (int i = 0; i < smoothingAgentsNr; i++){
             
-            Vector2Int startingPoint = pointsToSmooth[Random.Range(0, pointsToSmooth.Count)];
+            Vector2Int startingPoint = Vector2Int.RoundToInt(_coastlinePoints.ElementAt(Random.Range(0, _coastlinePoints.Count)));
 
             //Count for checking when the smoothing agent need to return to startingPoint
             int count = 0;
@@ -94,21 +97,6 @@ public class SmoothingAgent : MonoBehaviour
         Debug.Log("Finish smoothing...");
                 
         yield return BeachAgent.Instance.Action();
-    }
-
-    private List<Vector2Int> GetStartingPoint(){
-        
-        List<Vector2Int> pointsToSmooth = new List<Vector2Int>(); 
-
-        for (int i = 0; i < _x; i++){
-            for (int j = 0; j < _y; j++){
-                if(_heightmap[j, i] != 0){
-                    pointsToSmooth.Add(new Vector2Int(i, j));
-                }
-            }
-        } 
-
-        return pointsToSmooth;
     }
 
     public float VonNeumannNeighborhood(Vector2Int position){

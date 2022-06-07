@@ -45,7 +45,7 @@ public class CommentedScript : MonoBehaviour
     */
 
     // private Vector2 getEdgePoint(Vector2 start, Vector2 end){
-        
+
     //     int iORj = Random.Range(0, 2);
 
     //     int i = 0;
@@ -75,29 +75,106 @@ public class CommentedScript : MonoBehaviour
 
     //     return new Vector2(i, j);
     // }
-    
+
     // private Vector2 getRepulsor(Vector2 attractor)
     // {
-        // Vector2 attractorDirection = (attractor - _center).normalized;
+    // Vector2 attractorDirection = (attractor - _center).normalized;
 
-        // Calculating repulsor
-        // Vector2 repulsor = new Vector2(Random.Range(0, x), Random.Range(0, y));
-        // Vector2 repulsorDirection = (repulsor - _center).normalized;
-        //
-        // while (attractorDirection == repulsorDirection)
-        // {
-        //     repulsor = new Vector2(Random.Range(0, x), Random.Range(0, y));
-        //     repulsorDirection = (repulsor - _center).normalized;
-        // }
-        //
+    // Calculating repulsor
+    // Vector2 repulsor = new Vector2(Random.Range(0, x), Random.Range(0, y));
+    // Vector2 repulsorDirection = (repulsor - _center).normalized;
+    //
+    // while (attractorDirection == repulsorDirection)
+    // {
+    //     repulsor = new Vector2(Random.Range(0, x), Random.Range(0, y));
+    //     repulsorDirection = (repulsor - _center).normalized;
+    // }
+    //
     //     return repulsor;
+    // }
+
+    // private Vector2 GetAttractor()
+    // {
+    //     return new Vector2(Random.Range(0, _x), Random.Range(0, _y));
+    // }
+    //
+    // private Vector2 GetRepulsor(Vector2 attractor)
+    // {
+    //     Vector2 attractorDirection = (attractor - _center).normalized;
+    //
+    //     //Calculating repulsor
+    //     Vector2 repulsor = new Vector2(Random.Range(0, _x), Random.Range(0, _y));
+    //     Vector2 repulsorDirection = (repulsor - _center).normalized;
+    //
+    //     while (attractorDirection == repulsorDirection)
+    //     {
+    //         repulsor = new Vector2(Random.Range(0, _x), Random.Range(0, _y));
+    //         repulsorDirection = (repulsor - _center).normalized;
+    //     }
+    //
+    //     return repulsor;
+    // }
+    //
+    //
+    // private float ScorePoint(Vector2 point, Vector2 attractor, Vector2 repulsor)
+    // {
+    //     float result = Mathf.Pow(Vector2.Distance(point, repulsor), 2.0f) -
+    //                    Mathf.Pow(Vector2.Distance(point, attractor), 2.0f) +
+    //                    (3 * Mathf.Pow(GetClosestDistance(point), 2.0f));
+    //     return result;
+    // }
+    //
+    // private float GetClosestDistance(Vector2 point)
+    // {
+    //     //Order of the point inside the array to respect the Point point received from input: left, right, up, down 
+    //     Vector2[] borderPoints =
+    //     {
+    //         new Vector2(0, point.y), new Vector2(_x, point.y),
+    //         new Vector2(point.x, _y), new Vector2(point.x, 0)
+    //     };
+    //
+    //     float[] result = new float[borderPoints.Length];
+    //     for (int i = 0; i < result.Length; i++)
+    //     {
+    //         result[i] = Vector2.Distance(point, borderPoints[i]);
+    //     }
+    //
+    //     return result.OrderBy(a => a).ToArray()[0];
+    // }
+
+    // List<float> scores = new List<float>();
+    //
+    // foreach (Vector2Int candidate in candidates)
+    // {
+    //     Vector2 attractor = GetAttractor();
+    //     Vector2 repulsor = GetRepulsor(attractor);
+    //     scores.Add(ScorePoint(candidate, attractor, repulsor));
+    // }
+
+    // location = candidates[scores.IndexOf(scores.Max())];
+
+    //----------------------------- Smoothing Agent -----------------------------
+
+    // private List<Vector2Int> GetStartingPoint(){
+    //     
+    //     List<Vector2Int> pointsToSmooth = new List<Vector2Int>(); 
+    //
+    //     for (int i = 0; i < _x; i++){
+    //         for (int j = 0; j < _y; j++){
+    //             if(_heightmap[j, i] != 0){
+    //                 pointsToSmooth.Add(new Vector2Int(i, j));
+    //             }
+    //         }
+    //     } 
+    //
+    //     return pointsToSmooth;
     // }
 
 
     //----------------------------- City Agent -----------------------------
 
     // private IEnumerator cityActionCoroutine(){
-        
+
     //     List<Vector2> coastlinePoints = getCoastlinePoints();
     //     System.Random random = new System.Random();
     //     Vector2 location = coastlinePoints[random.Next(coastlinePoints.Count)];
@@ -115,7 +192,7 @@ public class CommentedScript : MonoBehaviour
     //     for(int i=0; i<cityAgentsNr; i++){
 
     //         for(int j=0; j<cityTokens; j++){
-                
+
     //             int randomDistance = Random.Range(2, distance+1);
 
     //             // Getting the points where to place the house
@@ -142,7 +219,7 @@ public class CommentedScript : MonoBehaviour
     //             road.layer = 8;
 
     //             while(agent.transform.position != worldLocation){
-                    
+
     //                 // Moving the agent towards the new location on the terrain.
     //                 agent.transform.position = Vector3.MoveTowards(agent.transform.position, worldLocation, speed * Time.deltaTime);
     //                 yield return 0;
@@ -173,40 +250,39 @@ public class CommentedScript : MonoBehaviour
 
     // for(int k=0; k<points.Length; k++){
 
-        //     if(!start){
-        //         if(checkLocation(points[k], location) && !roadPoints.Contains(points[k])){
-        //             checkedPoints.Add(points[k]);
-        //         }
-        //     }
-        //     else{
-        //         if(checkLocation(points[k], location)){
-        //             checkedPoints.Add(points[k]);
-        //         }
-        //     }
+    //     if(!start){
+    //         if(checkLocation(points[k], location) && !roadPoints.Contains(points[k])){
+    //             checkedPoints.Add(points[k]);
+    //         }
+    //     }
+    //     else{
+    //         if(checkLocation(points[k], location)){
+    //             checkedPoints.Add(points[k]);
+    //         }
+    //     }
 
-        //     // Debug.Log("PrevLocation: " + prevLocation + " Point: " + points[k].ToString() + " CheckPoint: " + chcekPoint(points[k], prevLocation));
-        // }
+    //     // Debug.Log("PrevLocation: " + prevLocation + " Point: " + points[k].ToString() + " CheckPoint: " + chcekPoint(points[k], prevLocation));
+    // }
 
-        // if(checkedPoints.Count != 0){
-        //     return checkedPoints[0];
-        // }
-        
-        //----------------------------- Harbor Agent -----------------------------
-        
-        // while (!CheckLocation(location, candidates))
-        // {
-        //     location = NewLocation(location, attractor, repulsor);
-        //     
-        //     // Check if agent get stuck
-        //     if (location == -Vector2.one)
-        //     {
-        //         // move the agent to random coastline point
-        //         location = RandomPoint();
-        //         continue;
-        //     }
-        //     
-        //     _visitedPoint.Add(GetPoint(location));
-        //     _visitedLocation.Add(location);
-        // }
-        
+    // if(checkedPoints.Count != 0){
+    //     return checkedPoints[0];
+    // }
+
+    //----------------------------- Harbor Agent -----------------------------
+
+    // while (!CheckLocation(location, candidates))
+    // {
+    //     location = NewLocation(location, attractor, repulsor);
+    //     
+    //     // Check if agent get stuck
+    //     if (location == -Vector2.one)
+    //     {
+    //         // move the agent to random coastline point
+    //         location = RandomPoint();
+    //         continue;
+    //     }
+    //     
+    //     _visitedPoint.Add(GetPoint(location));
+    //     _visitedLocation.Add(location);
+    // }
 }

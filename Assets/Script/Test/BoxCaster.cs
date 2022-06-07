@@ -7,29 +7,31 @@ public class BoxCaster : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
     }
 
     // Update is called once per frame
     void Update()
     {
-        
     }
 
-    void OnDrawGizmos(){
-        RaycastHit hit; 
+    void OnDrawGizmos()
+    {
+        RaycastHit hit;
 
-        Physics.BoxCast(transform.position, transform.lossyScale/20, transform.forward, out hit, Quaternion.identity, Mathf.Infinity);
+        Physics.BoxCast(transform.position, transform.lossyScale / 20, transform.forward, out hit, Quaternion.identity,
+            Mathf.Infinity);
 
-        if(hit.collider.name == "Cube"){
+        if (hit.collider.name == "Cube")
+        {
             Gizmos.color = Color.red;
             Gizmos.DrawRay(transform.position, transform.forward * hit.distance);
-            Gizmos.DrawWireCube(transform.position+transform.forward * hit.distance, transform.lossyScale);
+            Gizmos.DrawWireCube(transform.position + transform.forward * hit.distance, transform.lossyScale);
         }
-        else{
+        else
+        {
             Gizmos.color = Color.green;
             Gizmos.DrawRay(transform.position, transform.forward * hit.distance);
-            Gizmos.DrawWireCube(transform.position+transform.forward * hit.distance, transform.lossyScale);
+            Gizmos.DrawWireCube(transform.position + transform.forward * hit.distance, transform.lossyScale);
         }
     }
 }
