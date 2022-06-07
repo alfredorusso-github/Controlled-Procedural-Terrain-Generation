@@ -175,7 +175,7 @@ public class CoastlineAgent : MonoBehaviour
         Vector2 location = startingLocation;
 
         // Check if the direction not lead to a point outside the map
-        for (int i = 0; i < _x * .5f; i++)
+        for (int i = 0; i < _x; i++)
         {
             if (IsInsideTerrain(location) && CheckNearPoint(location) && _heightmap[(int) location.y,  (int) location.x] != 0)
             {
@@ -187,7 +187,7 @@ public class CoastlineAgent : MonoBehaviour
         
         // if here means the direction lead outside the map, use opposite direction
         location = startingLocation;
-        for (int i = 0; i < _x * .5f; i++)
+        for (int i = 0; i < _x; i++)
         {
             if (IsInsideTerrain(location) && CheckNearPoint(location) && _heightmap[(int) location.y,  (int) location.x] != 0)
             {

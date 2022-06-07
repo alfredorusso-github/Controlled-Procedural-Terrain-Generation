@@ -25,7 +25,11 @@ public class SmoothingAgent : MonoBehaviour
         Vector2Int.up,
         Vector2Int.down,
         Vector2Int.right,
-        Vector2Int.left
+        Vector2Int.left,
+        Vector2Int.one,
+        -Vector2Int.one,
+        new Vector2Int(1, -1),
+        new Vector2Int(-1, 1)
     };
 
     // Instance of this class
@@ -53,13 +57,12 @@ public class SmoothingAgent : MonoBehaviour
 
         //Initialize heightmap
         _heightmap = new float[_x, _y];
-
-        _coastlinePoints = FindObjectOfType<CoastlineAgent>().CoastlinePoints();
     }
 
     public IEnumerator Action(){  
 
         _heightmap = _td.GetHeights(0, 0, _x ,_y);
+        _coastlinePoints = FindObjectOfType<CoastlineAgent>().CoastlinePoints();
 
         Debug.Log("Starting smoothing...");
 
