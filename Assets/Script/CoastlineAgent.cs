@@ -76,7 +76,7 @@ public class CoastlineAgent : MonoBehaviour
         // Initialize Queue
         _agents = new Queue();
         
-        // Initialize coastline point list
+        // Initialize coastline points
         _coastlinePoints = new HashSet<Vector2>();
         
         // Instantiate first agent
@@ -121,21 +121,26 @@ public class CoastlineAgent : MonoBehaviour
         {
             Agent agent = (Agent)_agents.Dequeue();
             
-            Vector2 location = GetCoastlinePoints();
+            Vector2 location;
 
             if (_firstTime)
             {
+                location = GetStartingPoint();
                 _center = location;
                 _firstTime = false;
                 _coastlinePoints.Add(location);
                 Debug.Log("Island center: " + _center);
+            }
+            else
+            {
+                location = FindCoastlinePoint(agent);
             }
 
             for (int i = 0; i < coastlineTokens; i++)
             {
                 List<Vector2> candidates = NearPoints(location);
 
-                while (candidates.Count == 0)
+                if (candidates.Count == 0)
                 {
                     location = FindCoastlinePoint(agent);
                     candidates = NearPoints(location);
@@ -155,20 +160,22 @@ public class CoastlineAgent : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         Debug.Log("Vertex Elevated: " + _elevatedVertex);
-        
-        Debug.Log(_coastlinePoints.Count != _coastlinePoints.Distinct().ToList().Count);
 
         yield return SmoothingAgent.Instance.Action();
+    }
+
+    private Vector2 GetStartingPoint()
+    {
+        return startingFromMapCenter ? new Vector2(_x * .5f, _y * .5f) : new Vector2(Random.Range(0, _x), Random.Range(0, _y));
     }
     
     private Vector2 FindCoastlinePoint(Agent agent)
     {
         Vector2 startingLocation = RandomPoint();
         Vector2 location = startingLocation;
-        
-        
+
         // Check if the direction not lead to a point outside the map
-        for (int i = 0; i < _x/2; i++)
+        for (int i = 0; i < _x * .5f; i++)
         {
             if (IsInsideTerrain(location) && CheckNearPoint(location) && _heightmap[(int) location.y,  (int) location.x] != 0)
             {
@@ -178,16 +185,16 @@ public class CoastlineAgent : MonoBehaviour
             location += agent.GetDirection();
         }
         
-        // if here means the direction lead outside the map, change it
+        // if here means the direction lead outside the map, use opposite direction
         location = startingLocation;
-        for (int i = 0; i < _x/2; i++)
+        for (int i = 0; i < _x * .5f; i++)
         {
-            if (CheckNearPoint(location) && _heightmap[(int) location.y,  (int) location.x] != 0)
+            if (IsInsideTerrain(location) && CheckNearPoint(location) && _heightmap[(int) location.y,  (int) location.x] != 0)
             {
                 return location;
             }
 
-            location += - agent.GetDirection();
+            location -= agent.GetDirection();
         }
 
         return location;
@@ -196,36 +203,6 @@ public class CoastlineAgent : MonoBehaviour
     private Vector2 RandomPoint()
     {
         return _coastlinePoints.ElementAt(Random.Range(0, _coastlinePoints.Count));
-    }
-
-    private Vector2 GetCoastlinePoints()
-    {
-        List<Vector2> coastlinePoints = new List<Vector2>();
-    
-        for (int i = 0; i < _x; i++)
-        {
-            for (int j = 0; j < _y; j++)
-            {
-                Vector2 tmp = new Vector2(i, j);
-                if (CheckNearPoint(tmp) && _heightmap[(int) tmp.y, (int) tmp.x] != 0)
-                {
-                    coastlinePoints.Add(tmp);
-                }
-            }
-        }
-    
-        if (coastlinePoints.Count != 0)
-        {
-            return coastlinePoints[Random.Range(0, coastlinePoints.Count)];
-        }
-    
-        // If here means that the first agent is placed on the terrain
-        if (!startingFromMapCenter)
-        {
-            return new Vector2(Random.Range(0, _x), Random.Range(0, _y));
-        }
-    
-        return new Vector2(_x / 2, _y / 2);
     }
 
     private bool CheckNearPoint(Vector2 location)

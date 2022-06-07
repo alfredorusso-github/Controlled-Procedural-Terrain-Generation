@@ -152,6 +152,36 @@ public class CommentedScript : MonoBehaviour
     // }
 
     // location = candidates[scores.IndexOf(scores.Max())];
+    
+    // private Vector2 GetCoastlinePoints()
+    // {
+    //     List<Vector2> coastlinePoints = new List<Vector2>();
+    //
+    //     for (int i = 0; i < _x; i++)
+    //     {
+    //         for (int j = 0; j < _y; j++)
+    //         {
+    //             Vector2 tmp = new Vector2(i, j);
+    //             if (CheckNearPoint(tmp) && _heightmap[(int) tmp.y, (int) tmp.x] != 0)
+    //             {
+    //                 coastlinePoints.Add(tmp);
+    //             }
+    //         }
+    //     }
+    //
+    //     if (coastlinePoints.Count != 0)
+    //     {
+    //         return coastlinePoints[Random.Range(0, coastlinePoints.Count)];
+    //     }
+    //
+    //     // If here means that the first agent is placed on the terrain
+    //     if (!startingFromMapCenter)
+    //     {
+    //         return new Vector2(Random.Range(0, _x), Random.Range(0, _y));
+    //     }
+    //
+    //     return new Vector2(_x * .5f, _y * .5f);
+    // }
 
     //----------------------------- Smoothing Agent -----------------------------
 
