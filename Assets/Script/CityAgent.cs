@@ -43,8 +43,6 @@ public class CityAgent : MonoBehaviour
     private List<Vector2Int> _points;
     private bool _start;
 
-    Vector3 _point;
-
     void Start()
     {
 

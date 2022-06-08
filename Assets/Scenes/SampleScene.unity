@@ -166,7 +166,7 @@ MonoBehaviour:
   houseGameObject: {fileID: 4104808338139126055, guid: d8b6324be2a50ea24b94d6069d4053c0, type: 3}
   gap: 2
   distance: 8
-  numberOfHouse: 1
+  numberOfHouse: 3
 --- !u!154 &77329740
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -282,7 +282,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 34b9b52151c45c40bada96c4f5a12005, type: 3}
   m_Name: 

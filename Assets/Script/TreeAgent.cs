@@ -16,7 +16,7 @@ public class TreeAgent : MonoBehaviour
     public int agentNr;
     public int token;
     public int returnValue;
-    [Range(2, 8)] public int distance;
+    [Range(5, 10)] public int distance;
 
     // Tree prefab 
     public GameObject tree;
@@ -98,8 +98,7 @@ public class TreeAgent : MonoBehaviour
     {
         _heightmap = _td.GetHeights(0, 0, _x, _y);
 
-        _validPoints = new List<Vector2Int>();
-        ValidPoints();
+        _validPoints = ValidPoints();
 
         for (int i = 0; i < agentNr; i++)
         {
@@ -114,13 +113,14 @@ public class TreeAgent : MonoBehaviour
                 for (int k = 0; k < returnValue; k++)
                 {
                     // Place tree
-                    tree = Instantiate(tree, GetHeight(candidate), Quaternion.identity);
+                    Instantiate(tree, GetHeight(candidate), Quaternion.identity);
 
                     // Check if there is a candidate point where agent can move
                     Vector2Int checkCandidate = GetNearbyPoint(candidate);
                     if (candidate == checkCandidate)
                     {
                         // There are no more near point where it is possible to place tree
+                        Debug.Log("Agent can't find a valid point where to place tree");
                         break;
                     }
 
@@ -140,10 +140,12 @@ public class TreeAgent : MonoBehaviour
         return _validPoints[Random.Range(0, _validPoints.Count)];
     }
 
-    private void ValidPoints()
+    private List<Vector2Int> ValidPoints()
     {
         float ah = AverageHeight();
         Debug.Log("Average height of the island: " + ah);
+
+        List<Vector2Int> validPoints = new List<Vector2Int>();
 
         for (int i = 0; i < _x; i++)
         {
@@ -151,10 +153,12 @@ public class TreeAgent : MonoBehaviour
             {
                 if (_heightmap[j, i] > ah + .05f && CheckSteepness(new Vector2(i, j)))
                 {
-                    _validPoints.Add(new Vector2Int(i, j));
+                    validPoints.Add(new Vector2Int(i, j));
                 }
             }
         }
+
+        return validPoints;
     }
 
     private float AverageHeight()
@@ -198,7 +202,7 @@ public class TreeAgent : MonoBehaviour
     {
         List<Vector2Int> candidates = new List<Vector2Int>();
 
-        int randomDistance = Random.Range(2, distance);
+        int randomDistance = Random.Range(5, distance);
 
         foreach (Vector2Int point in _nearbyPoint)
         {
