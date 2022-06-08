@@ -106,7 +106,7 @@ public class CoastlineAgent : MonoBehaviour
         {
             for (int i = 0; i < 2; i++)
             {
-                GetCoastlineAgents(new Agent(agent.GetVertex() / 2, Random.insideUnitCircle.normalized));
+                GetCoastlineAgents(new Agent(agent.GetVertex() / 2, _directions[Random.Range(0, _directions.Length)]));
             }
         }
         else

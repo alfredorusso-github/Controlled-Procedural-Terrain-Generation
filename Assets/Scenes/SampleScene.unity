@@ -239,7 +239,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   startingFromMapCenter: 1
   coastlineTokens: 100
-  vertexLimit: 1500
+  vertexLimit: 1200
   maxHeight: 0.5
 --- !u!114 &77329744
 MonoBehaviour:
@@ -253,7 +253,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb5d5a4266d9ff2d8bcfbc8a76a6244, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smoothingAgentsNr: 1500
+  smoothingAgentsNr: 4000
   returnValue: 2
   smoothingTokens: 3000
 --- !u!114 &77329745
@@ -305,9 +305,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 501519120d504024fb5b22ff190eac36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  AgentNr: 10
-  Token: 10
-  ReturnValue: 5
+  agentNr: 10
+  token: 10
+  returnValue: 5
   distance: 8
   tree: {fileID: 1512810094444040, guid: 4cde6ae520caf47bc9cefb7505852a96, type: 3}
 --- !u!114 &77329749
