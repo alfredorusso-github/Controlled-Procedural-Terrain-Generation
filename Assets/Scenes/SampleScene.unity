@@ -155,18 +155,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a7cc6ba1d00fbb08a56ed9e07bfd5d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   cityAgentsNr: 5
   cityTokens: 20
-  roads: {fileID: 3089296634764339710, guid: f10b1ee675cddc8fabea24e911072996, type: 3}
-  palace: {fileID: 4104808338139126055, guid: d8b6324be2a50ea24b94d6069d4053c0, type: 3}
+  roadGameObject: {fileID: 3089296634764339710, guid: f10b1ee675cddc8fabea24e911072996, type: 3}
+  houseGameObject: {fileID: 4104808338139126055, guid: d8b6324be2a50ea24b94d6069d4053c0, type: 3}
   gap: 2
   distance: 8
-  NumberOfHouse: 3
+  numberOfHouse: 1
 --- !u!154 &77329740
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -232,7 +232,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c73093679ca0a0c3aa714c6b58d9126a, type: 3}
   m_Name: 
@@ -248,7 +248,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8fb5d5a4266d9ff2d8bcfbc8a76a6244, type: 3}
   m_Name: 
@@ -263,7 +263,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b3844b57e1120408690447fec59e7b33, type: 3}
   m_Name: 
@@ -300,7 +300,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 501519120d504024fb5b22ff190eac36, type: 3}
   m_Name: 

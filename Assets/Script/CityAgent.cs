@@ -7,20 +7,21 @@ using UnityEngine;
 public class CityAgent : MonoBehaviour
 {
     //Terrain data
-    private Terrain terrain;
-    private TerrainData td;
-    private int x;
-    private int y;
-    private float[,] heightmap;
+    private Terrain _terrain;
+    private TerrainData _td;
+    private int _x;
+    private int _y;
+    private float[,] _heightmap;
 
     //City agent
     public int cityAgentsNr;
     public int cityTokens;
-    public GameObject roads = null;
-    public GameObject palace = null;
+    public GameObject roadGameObject;
+    public GameObject houseGameObject;
     public int gap;
     [Range(5, 20)] public int distance;
-    public int maxNHouse
+    
+    public int MaxNHouse
     {
         get
         {
@@ -31,31 +32,32 @@ public class CityAgent : MonoBehaviour
             return (distance / gap) - 1;
         }
     }
+    
     [HideInInspector]
-    public int NumberOfHouse = 1;
+    public int numberOfHouse = 1;
 
     // Instance of this class
     public static CityAgent Instance;
 
     // OnDrawGizmos
-    List<Vector2Int> points;
-    bool start;
+    private List<Vector2Int> _points;
+    private bool _start;
 
-    Vector3 point;
+    Vector3 _point;
 
     void Start()
     {
 
         //Getting terrain information
-        terrain = GetComponent<Terrain>();
-        td = terrain.terrainData;
-        x = td.heightmapResolution;
-        y = td.heightmapResolution;
+        _terrain = GetComponent<Terrain>();
+        _td = _terrain.terrainData;
+        _x = _td.heightmapResolution;
+        _y = _td.heightmapResolution;
 
-        //Initialize heighmap
-        heightmap = new float[x, y];
+        //Initialize heightmap
+        _heightmap = new float[_x, _y];
 
-        points = new List<Vector2Int>();
+        _points = new List<Vector2Int>();
 
         StartCoroutine(Action());
     }
@@ -64,9 +66,9 @@ public class CityAgent : MonoBehaviour
     {
         Gizmos.color = Color.red;
 
-        if (start)
+        if (_start)
         {
-            foreach (var point in points)
+            foreach (var point in _points)
             {
                 Gizmos.DrawSphere(GetHeight(point), .2f);
             }
@@ -75,30 +77,24 @@ public class CityAgent : MonoBehaviour
 
     private Vector3 GetHeight(Vector2 location)
     {
-        //Create object to store raycast data
-        RaycastHit hit;
-
         //Create origin for raycast that is above the terrain. I chose 100.
         Vector3 origin = new Vector3(location.x, 100, location.y);
 
         //Send the raycast.
-        Physics.Raycast(origin, Vector3.down, out hit);
+        Physics.Raycast(origin, Vector3.down, out var hit);
 
         return hit.point;
     }
 
     private IEnumerator Action()
     {
+        _heightmap = _td.GetHeights(0, 0, _x, _y);
 
-        heightmap = td.GetHeights(0, 0, x, y);
-
-        List<Vector2Int> validPoints = getValidPoints();
+        List<Vector2Int> validPoints = GetValidPoints();
         Debug.Log("Number of valid points: " + validPoints.Count);
 
-        // this.start = true;
-
         // Getting terrain position
-        Vector3 terrainPos = terrain.GetPosition();
+        Vector3 terrainPos = _terrain.GetPosition();
 
         for (int i = 0; i < cityAgentsNr; i++)
         {
@@ -107,18 +103,18 @@ public class CityAgent : MonoBehaviour
 
             Vector2Int previousLocation = location;
 
-            location = getNewLocation(location, previousLocation);
+            location = GetNewLocation(location, previousLocation);
 
             for (int j = 0; j < cityTokens; j++)
             {
 
-                createRoad(location, previousLocation, terrainPos);
-                createPalace(location, previousLocation, terrainPos);
+                CreateRoad(location, previousLocation, terrainPos);
+                CreateHouse(location, previousLocation, terrainPos);
 
                 yield return new WaitForEndOfFrame();
 
                 Vector2Int tmp = location;
-                location = getNewLocation(location, previousLocation);
+                location = GetNewLocation(location, previousLocation);
 
                 if (location == tmp)
                 {
@@ -134,39 +130,39 @@ public class CityAgent : MonoBehaviour
         yield return TreeAgent.Instance.Action();
     }
 
-    private List<Vector2Int> getValidPoints()
+    private List<Vector2Int> GetValidPoints()
     {
 
-        float ah = averageHeight();
+        float ah = AverageHeight();
         Debug.Log("Average height of the island: " + ah);
 
-        for (int i = 0; i < x; i++)
+        for (int i = 0; i < _x; i++)
         {
-            for (int j = 0; j < y; j++)
+            for (int j = 0; j < _y; j++)
             {
-                if (heightmap[j, i] > ah + .05f && checkSteepness(new Vector2(i, j)))
+                if (_heightmap[j, i] > ah + .05f && CheckSteepness(new Vector2(i, j)))
                 {
-                    points.Add(new Vector2Int(i, j));
+                    _points.Add(new Vector2Int(i, j));
                 }
             }
         }
 
-        return points;
+        return _points;
     }
 
-    private float averageHeight()
+    private float AverageHeight()
     {
 
         float sum = 0.0f;
         int nPoints = 0;
 
-        for (int i = 0; i < x; i++)
+        for (int i = 0; i < _x; i++)
         {
-            for (int j = 0; j < y; j++)
+            for (int j = 0; j < _y; j++)
             {
-                if (heightmap[j, i] > 0.01f)
+                if (_heightmap[j, i] > 0.01f)
                 {
-                    sum += heightmap[j, i];
+                    sum += _heightmap[j, i];
                     nPoints++;
                 }
             }
@@ -175,64 +171,39 @@ public class CityAgent : MonoBehaviour
         return sum / nPoints;
     }
 
-    private bool checkSteepness(Vector2 location)
+    private bool CheckSteepness(Vector2 location)
     {
-
-        //Create object to store raycast data
-        RaycastHit hit;
-
         //Create origin for raycast that is above the terrain. I chose 100.
-        Vector3 origin = new Vector3(location.x, 100, location.y);
+        Vector3 origin = new Vector3(location.x, _td.size.y + 10f, location.y);
 
         //Send the raycast.
-        Physics.Raycast(origin, Vector3.down, out hit);
+        Physics.Raycast(origin, Vector3.down, out var hit);
 
-        if (Vector3.Angle(hit.normal, Vector3.up) < 7.0f)
-        {
-            return true;
-        }
-
-        return false;
+        return Vector3.Angle(hit.normal, Vector3.up) < 7.0f;
     }
 
-    private Vector2Int getNewLocation(Vector2Int location, Vector2Int previousLocation)
+    private Vector2Int GetNewLocation(Vector2Int location, Vector2Int previousLocation)
     {
-
-        Vector2Int[] candidates;
-
-        if (previousLocation != location)
-        {
-            candidates = getCandidates(location, previousLocation);
-        }
-        else
-        {
-            candidates = getCandidates(location);
-        }
+        Vector2Int[] candidates = previousLocation != location ? GetCandidates(location, previousLocation) : GetCandidates(location);
 
         List<Vector2Int> checkedCandidates = new List<Vector2Int>();
 
-        for (int k = 0; k < candidates.Length; k++)
+        foreach (var candidate in candidates)
         {
-
-            if (checkCandidate(candidates[k], location))
+            if (CheckCandidate(candidate, location))
             {
-                checkedCandidates.Add(candidates[k]);
+                checkedCandidates.Add(candidate);
             }
-
         }
 
-        if (checkedCandidates.Count != 0)
-        {
-            return checkedCandidates[Random.Range(0, checkedCandidates.Count)];
-        }
-
-        return location;
+        return checkedCandidates.Count != 0 ? checkedCandidates[Random.Range(0, checkedCandidates.Count)] : location;
     }
 
-    private Vector2Int[] getCandidates(Vector2Int location)
+    private Vector2Int[] GetCandidates(Vector2Int location)
     {
 
-        Vector2Int[] points = new Vector2Int[]{
+        Vector2Int[] points =
+        {
             location + Vector2Int.down * distance,
             location + Vector2Int.up * distance,
             location + Vector2Int.right * distance,
@@ -242,7 +213,7 @@ public class CityAgent : MonoBehaviour
         return points;
     }
 
-    private Vector2Int[] getCandidates(Vector2Int location, Vector2 prevLocation)
+    private Vector2Int[] GetCandidates(Vector2Int location, Vector2 prevLocation)
     {
 
         Vector2 dir = (location - prevLocation).normalized;
@@ -260,17 +231,17 @@ public class CityAgent : MonoBehaviour
     // @param
     // location = k
     // prevLocation = location
-    private bool checkCandidate(Vector2 location, Vector2 previousLocation)
+    private bool CheckCandidate(Vector2 location, Vector2 previousLocation)
     {
 
         // Check if the location is inside the terrain
-        if (!(location.x >= 0 && location.x <= (x - 2)) || !(location.y >= 0 && location.y <= (y - 2)))
+        if (!(location.x >= 0 && location.x <= (_x - 2)) || !(location.y >= 0 && location.y <= (_y - 2)))
         {
             return false;
         }
 
         // Check the steepness of the point
-        if (!checkSteepness(location))
+        if (!CheckSteepness(location))
         {
             return false;
         }
@@ -291,7 +262,6 @@ public class CityAgent : MonoBehaviour
 
         for (int i = 0; i < dist - 1; i++)
         {
-
             Vector2 right = previousLocation + perpendicularDir;
             Vector2 right2 = previousLocation + perpendicularDir * 2;
 
@@ -335,29 +305,28 @@ public class CityAgent : MonoBehaviour
         return true;
     }
 
-    private void createRoad(Vector2 location, Vector2 prevLocation, Vector3 pos)
+    private void CreateRoad(Vector2 location, Vector2 prevLocation, Vector3 pos)
     {
-
         Vector3 worldLocation = GetHeight(new Vector2(location.x + pos.x, location.y + pos.z));
         Vector3 prevWorldLocation = GetHeight(new Vector2(prevLocation.x + pos.x, prevLocation.y + pos.z));
 
         Vector3 dir = (worldLocation - prevWorldLocation).normalized;
 
         float length = Vector3.Distance(worldLocation, prevWorldLocation);
-        Quaternion rot_road = Quaternion.identity;
+        Quaternion roadRot = Quaternion.identity;
         if (dir != Vector3.zero)
         {
-            rot_road = Quaternion.LookRotation(dir, Vector3.up);
+            roadRot = Quaternion.LookRotation(dir, Vector3.up);
         }
-        Vector3 scale_road = new Vector3(1.0f, 1.0f, length);
+        Vector3 scaleRoad = new Vector3(1.0f, 1.0f, length);
 
-        var road = Instantiate(roads, worldLocation, rot_road);
+        GameObject road = Instantiate(roadGameObject, worldLocation, roadRot);
         road.transform.Translate(Vector3.up * .1f);
-        road.transform.Translate(-Vector3.forward * (length + 1.0f) * 0.5f);
-        road.transform.localScale = scale_road;
+        road.transform.Translate(-Vector3.forward * ((length + 1.0f) * 0.5f));
+        road.transform.localScale = scaleRoad;
     }
 
-    private void createPalace(Vector2 location, Vector2 prevLocation, Vector3 pos)
+    private void CreateHouse(Vector2 location, Vector2 prevLocation, Vector3 pos)
     {
 
         Vector3 worldLocation = GetHeight(new Vector2(location.x + pos.x, location.y + pos.z));
@@ -365,46 +334,41 @@ public class CityAgent : MonoBehaviour
 
         Vector3 dir = (worldLocation - prevWorldLocation).normalized;
 
-        // Debug.Log("WorldLocation: " + worldLocation + " Prev: " + prevWorldLocation + " Direction: " + dir + " Cross with Vector3.up: " + Vector3.Cross(dir, Vector3.up));
-
-        Vector3 palace_pos = Vector3.Lerp(worldLocation, prevWorldLocation, 0.5f);
-        Quaternion rot_palace = Quaternion.identity;
+        Vector3 housePos = Vector3.Lerp(worldLocation, prevWorldLocation, 0.5f);
+        Quaternion houseRot = Quaternion.identity;
         if (dir != Vector3.zero)
         {
-            rot_palace = Quaternion.LookRotation(Vector3.Cross(dir, Vector3.up), Vector3.up);
+            houseRot = Quaternion.LookRotation(Vector3.Cross(dir, Vector3.up), Vector3.up);
         }
 
-        var pal = Instantiate(palace, palace_pos, rot_palace);
-        pal.transform.Translate(Vector3.up * 0.5f);
-        pal.transform.Translate(-Vector3.forward);
-        // pal.AddComponent<RayCaster>();
+        GameObject house = Instantiate(houseGameObject, housePos, houseRot);
+        house.transform.Translate(Vector3.up * 0.5f);
+        house.transform.Translate(-Vector3.forward);
 
-        if (NumberOfHouse == 1)
+        if (numberOfHouse == 1)
         {
             return;
         }
 
-        Vector3 pos_right = palace_pos;
-        Vector3 pos_left = palace_pos;
+        Vector3 rightPos = housePos;
+        Vector3 leftPos = housePos;
 
-        for (int i = 0; i < NumberOfHouse - 1; i++)
+        for (int i = 0; i < numberOfHouse - 1; i++)
         {
 
             if (i % 2 == 0)
             {
-                pos_right += dir * gap;
-                pal = Instantiate(palace, pos_right, rot_palace);
-                pal.transform.Translate(Vector3.up * 0.5f);
-                pal.transform.Translate(-Vector3.forward);
-                // pal.AddComponent<RayCaster>();
+                rightPos += dir * gap;
+                house = Instantiate(houseGameObject, rightPos, houseRot);
+                house.transform.Translate(Vector3.up * 0.5f);
+                house.transform.Translate(-Vector3.forward);
             }
             else
             {
-                pos_left -= dir * gap;
-                pal = Instantiate(palace, pos_left, rot_palace);
-                pal.transform.Translate(Vector3.up * 0.5f);
-                pal.transform.Translate(-Vector3.forward);
-                // pal.AddComponent<RayCaster>();
+                leftPos -= dir * gap;
+                house = Instantiate(houseGameObject, leftPos, houseRot);
+                house.transform.Translate(Vector3.up * 0.5f);
+                house.transform.Translate(-Vector3.forward);
             }
 
         }

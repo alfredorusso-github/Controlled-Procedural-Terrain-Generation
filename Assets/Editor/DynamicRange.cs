@@ -9,7 +9,7 @@ public class DynamicRange : Editor {
 
         CityAgent script = (CityAgent)target;
 
-        script.NumberOfHouse = EditorGUILayout.IntSlider("Number Of House", script.NumberOfHouse, 1, script.maxNHouse);
+        script.numberOfHouse = EditorGUILayout.IntSlider("Number Of House", script.numberOfHouse, 1, script.MaxNHouse);
     }
 
 }
