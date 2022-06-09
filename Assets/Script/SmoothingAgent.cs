@@ -102,18 +102,10 @@ public class SmoothingAgent : MonoBehaviour
         yield return BeachAgent.Instance.Action();
     }
 
-    public float VonNeumannNeighborhood(Vector2Int position){
-        //Per calcolare la nuova altezza del punto nella posizione position vengono presi in cosiderazione i 4 punti che circondano tale punto e quelli dietro questi.
-        //Viene assegnato un peso a tali punti, in particolare avremo che il punto centrale deve avere un peso 3 volte maggiore rispetto agli altri e che la somma dei pesi dei
-        //9 punti presi in considerazione deve essere uguale a 11. Inoltre ai punti dietro quelli che circondano il punto centrale é stata assegnato un peso che é la metá di questi per fari si
-        //che influenzassero meno il calcolo della nuova altezza. Partendo da queste informazioni e risolvendo in il sistema che viene fuori avremo che:
-        // - il peso del punto centrale é 11/3
-        // - il peso dei punti che circondano p é 11/9
-        // - il peso dei punti dietro quelli che circondano p é 11/18
+    private float VonNeumannNeighborhood(Vector2Int position){
 
-        float centralPointWeight = 11.0f/3.0f;
-        float surroundingWeight = 11.0f/9.0f;
-        float beyondSurroundingWeight = 11.0f/18.0f;
+        float centralPointWeight = 11.0f/4.0f;
+        float surroundingWeight = 33.0f/4.0f;
 
         float centralPointHeight = _heightmap[position.y, position.x]; 
 
@@ -131,9 +123,9 @@ public class SmoothingAgent : MonoBehaviour
 
         float [] heights = new float[surroundingPoints.Length];
 
-        for(int i=0; i<surroundingPoints.Length; i++){
+        for(int i=0; i < surroundingPoints.Length; i++){
             
-            if( CheckLimit(surroundingPoints[i]) ){
+            if( IsInsideTerrain(surroundingPoints[i]) ){
                 heights[i] = _heightmap[surroundingPoints[i].y, surroundingPoints[i].x];
             }
             else{
@@ -142,16 +134,12 @@ public class SmoothingAgent : MonoBehaviour
         }
 
         float num = centralPointHeight * centralPointWeight;
-        for(int i=0; i<heights.Length; i++){
-            if(i<4){
-                num += heights[i] * surroundingWeight;
-            }
-            else{
-                num += heights[i] * beyondSurroundingWeight;
-            }
+        foreach (float height in heights)
+        {
+            num += height * surroundingWeight;
         }
 
-        float denom = centralPointWeight + (4*surroundingWeight) + (4*beyondSurroundingWeight); 
+        float denom = centralPointWeight + 8 * surroundingWeight; 
 
         return num/denom;
     }
@@ -161,7 +149,7 @@ public class SmoothingAgent : MonoBehaviour
         // if the agents never move itself outside the maps, the list will always have at least three point inside
         List<Vector2Int> check = new List<Vector2Int>();
         foreach(Vector2Int point in _neighboringPoint){
-            if((CheckLimit(position + point))){
+            if((IsInsideTerrain(position + point))){
                 check.Add(position + point);
             }
         }
@@ -169,7 +157,7 @@ public class SmoothingAgent : MonoBehaviour
         return check[Random.Range(0, check.Count)];
     }
 
-    private bool CheckLimit(Vector2Int point){
+    private bool IsInsideTerrain(Vector2Int point){
         if(point.x >= 0 && point.x < _x && point.y >= 0 && point.y < _y){
             return true;
         }

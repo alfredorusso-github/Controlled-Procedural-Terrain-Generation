@@ -199,6 +199,14 @@ public class CommentedScript : MonoBehaviour
     //
     //     return pointsToSmooth;
     // }
+    
+    //Per calcolare la nuova altezza del punto nella posizione position vengono presi in cosiderazione i 4 punti che circondano tale punto e quelli dietro questi.
+    //Viene assegnato un peso a tali punti, in particolare avremo che il punto centrale deve avere un peso 3 volte maggiore rispetto agli altri e che la somma dei pesi dei
+    //9 punti presi in considerazione deve essere uguale a 11. Inoltre ai punti dietro quelli che circondano il punto centrale é stata assegnato un peso che é la metá di questi per fari si
+    //che influenzassero meno il calcolo della nuova altezza. Partendo da queste informazioni e risolvendo in il sistema che viene fuori avremo che:
+    // - il peso del punto centrale é 11/3
+    // - il peso dei punti che circondano p é 11/9
+    // - il peso dei punti dietro quelli che circondano p é 11/18
 
 
     //----------------------------- City Agent -----------------------------
