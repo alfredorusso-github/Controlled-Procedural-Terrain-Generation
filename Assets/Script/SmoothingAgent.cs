@@ -128,7 +128,8 @@ public class SmoothingAgent : MonoBehaviour
             if( IsInsideTerrain(surroundingPoints[i]) ){
                 heights[i] = _heightmap[surroundingPoints[i].y, surroundingPoints[i].x];
             }
-            else{
+            else
+            {
                 heights[i] = _heightmap[position.y, position.x];
             }            
         }

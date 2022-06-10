@@ -255,7 +255,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   smoothingAgentsNr: 2000
   returnValue: 2
-  smoothingTokens: 2000
+  smoothingTokens: 2500
 --- !u!114 &77329745
 MonoBehaviour:
   m_ObjectHideFlags: 0

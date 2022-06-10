@@ -110,7 +110,7 @@ public class BeachAgent : MonoBehaviour
                         {
                             _heightmap[point.y, point.x] = Random.Range(.003f, beachHeight);
                         }
-
+                    
                         //smooth area around away
                         _heightmap[away.y, away.x] = VonNeumannNeighborhood(away);
                         foreach (Vector2Int point in GetNeighboringPoints(away))
@@ -139,7 +139,7 @@ public class BeachAgent : MonoBehaviour
 
         SplatMap.Instance.MakeSplatMap();
     }
-
+    
     private List<Vector2Int> GetShorelinePoints()
     {
         List<Vector2Int> shorelinePoints = new List<Vector2Int>();
@@ -160,12 +160,7 @@ public class BeachAgent : MonoBehaviour
 
     private bool CheckShorelinePoint(float heightMapValue, int i, int j)
     {
-        if (heightMapValue >= .003f && heightMapValue <= .006f && i + awayLimit < _x && j + awayLimit < _y)
-        {
-            return true;
-        }
-
-        return false;
+        return heightMapValue >= .003f && heightMapValue < .01f && i + awayLimit < _x && j + awayLimit < _y;
     }
 
     private List<Vector2Int> GetNeighboringPoints(Vector2Int location)
@@ -186,34 +181,23 @@ public class BeachAgent : MonoBehaviour
     {
         List<Vector2Int> candidates = GetNeighboringPoints(location);
 
-        if (candidates.Count == 0)
+        if (candidates.Count != 0)
         {
-            Debug.Log("Impossible to find an away point");
-            return -Vector2Int.one;
+            return candidates[Random.Range(0, candidates.Count)];
         }
-
-        return candidates[Random.Range(0, candidates.Count)];
+        
+        Debug.Log("Impossible to find a valid point");
+        return -Vector2Int.one;
     }
 
-    private bool CheckLimit(Vector2Int location)
+    private bool IsInsideTerrain(Vector2Int location)
     {
-        if ((location.x >= 0 && location.x <= (_x - 1)) && (location.y >= 0 && location.y <= (_y - 1)))
-        {
-            return true;
-        }
-
-        return false;
+        return location.x >= 0 && location.x <= _x - 1 && location.y >= 0 && location.y <= _y - 1;
     }
 
     private bool CheckNeighboringPoint(Vector2Int point)
     {
-        if ((point.x >= 0 && point.x <= (_x - 1)) && (point.y >= 0 && point.y <= (_y - 1)) &&
-            _heightmap[point.y, point.x] <= 0.01)
-        {
-            return true;
-        }
-
-        return false;
+        return IsInsideTerrain(point) && _heightmap[point.y, point.x] <= 0.01;
     }
 
     private Vector2Int AwayRandomPoint(Vector2Int position)
@@ -224,7 +208,7 @@ public class BeachAgent : MonoBehaviour
         {
             Vector2Int randomPoint = position + point * awayLimit;
 
-            if (CheckLimit(randomPoint) && _heightmap[randomPoint.y, randomPoint.x] < .01f)
+            if (IsInsideTerrain(randomPoint) && _heightmap[randomPoint.y, randomPoint.x] < .01f)
             {
                 candidates.Add(randomPoint);
             }
@@ -249,63 +233,46 @@ public class BeachAgent : MonoBehaviour
         _td.SetHeights(0, 0, _heightmap);
     }
 
-    private float VonNeumannNeighborhood(Vector2Int position)
-    {
-        //Per calcolare la nuova altezza del punto nella posizione position vengono presi in cosiderazione i 4 punti che circondano tale punto e quelli dietro questi.
-        //Viene assegnato un peso a tali punti, in particolare avremo che il punto centrale deve avere un peso 3 volte maggiore rispetto agli altri e che la somma dei pesi dei
-        //9 punti presi in considerazione deve essere uguale a 11. Inoltre ai punti dietro quelli che circondano il punto centrale é stata assegnato un peso che é la metá di questi per fari si
-        //che influenzassero meno il calcolo della nuova altezza. Partendo da queste informazioni e risolvendo in il sistema che viene fuori avremo che:
-        // - il peso del punto centrale é 11/3
-        // - il peso dei punti che circondano p é 11/9
-        // - il peso dei punti dietro quelli che circondano p é 11/18
+    private float VonNeumannNeighborhood(Vector2Int position){
 
-        float centralPointWeight = 11.0f / 3.0f;
-        float surroundingWeight = 11.0f / 9.0f;
-        float beyondSurroundingWeight = 11.0f / 18.0f;
+        float centralPointWeight = 11.0f/4.0f;
+        float surroundingWeight = 33.0f/4.0f;
 
-        float centralPointHeight = _heightmap[position.y, position.x];
+        float centralPointHeight = _heightmap[position.y, position.x]; 
 
-        Vector2Int[] surroundingPoints =
-        {
+        Vector2Int [] surroundingPoints = {
             position + Vector2Int.right,
-            position + Vector2Int.left,
-            position + Vector2Int.up,
-            position + Vector2Int.down,
-            position + Vector2Int.right * 2,
-            position + Vector2Int.left * 2,
-            position + Vector2Int.up * 2,
-            position + Vector2Int.down * 2
+            position + Vector2Int.left, 
+            position + Vector2Int.up, 
+            position + Vector2Int.down, 
+            position + Vector2Int.right * 2, 
+            position + Vector2Int.left * 2, 
+            position + Vector2Int.up * 2, 
+            position + Vector2Int.down * 2 
+            
         };
 
-        float[] heights = new float[surroundingPoints.Length];
+        float [] heights = new float[surroundingPoints.Length];
 
-        for (int i = 0; i < surroundingPoints.Length; i++)
-        {
-            if (CheckLimit(surroundingPoints[i]))
-            {
+        for(int i=0; i < surroundingPoints.Length; i++){
+            
+            if( IsInsideTerrain(surroundingPoints[i]) ){
                 heights[i] = _heightmap[surroundingPoints[i].y, surroundingPoints[i].x];
             }
             else
             {
-                heights[i] = 0;
-            }
+                heights[i] = _heightmap[position.y, position.x];
+            }            
         }
 
         float num = centralPointHeight * centralPointWeight;
-        for (int i = 0; i < heights.Length; i++)
+        foreach (float height in heights)
         {
-            if (i < 4)
-            {
-                num += heights[i] * surroundingWeight;
-            }
-            else
-            {
-                num += heights[i] * beyondSurroundingWeight;
-            }
+            num += height * surroundingWeight;
         }
 
-        float denom = centralPointWeight + (4 * surroundingWeight) + (4 * beyondSurroundingWeight);
+        float denom = centralPointWeight + 8 * surroundingWeight; 
 
-        return num / denom;
+        return num/denom;
     }
 }
