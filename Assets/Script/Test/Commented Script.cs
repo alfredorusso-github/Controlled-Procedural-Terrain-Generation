@@ -231,12 +231,12 @@ public class CommentedScript : MonoBehaviour
 
     //         for(int j=0; j<cityTokens; j++){
 
-    //             int randomDistance = Random.Range(2, distance+1);
+    //             int randomDistance = Random.Range(2, roadLenght+1);
 
     //             // Getting the points where to place the house
     //             location += new Vector2((int)(Random.insideUnitCircle * randomDistance).x, (int)(Random.insideUnitCircle * randomDistance).y) * randomDistance;
     //             // while(!checkLocation(location, aHeight)){
-    //             //     location += InsideArc(distance);
+    //             //     location += InsideArc(roadLenght);
     //             // }
 
     //             Vector3 worldLocation = GetTerrainPos(pos.x+location.x, pos.z+location.y);
@@ -304,6 +304,18 @@ public class CommentedScript : MonoBehaviour
 
     // if(checkedPoints.Count != 0){
     //     return checkedPoints[0];
+    // }
+    
+    // public int MaxNHouse
+    // {
+    //     get
+    //     {
+    //         if (gap == 1)
+    //         {
+    //             return (roadLenght / gap) - 2;
+    //         }
+    //         return (roadLenght / gap) - 1;
+    //     }
     // }
 
     //----------------------------- Harbor Agent -----------------------------

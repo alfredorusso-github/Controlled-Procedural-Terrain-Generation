@@ -19,19 +19,9 @@ public class CityAgent : MonoBehaviour
     public GameObject roadGameObject;
     public GameObject houseGameObject;
     public int gap;
-    [Range(5, 20)] public int distance;
+    [Range(5, 20)] public int roadLenght;
     
-    public int MaxNHouse
-    {
-        get
-        {
-            if (gap == 1)
-            {
-                return (distance / gap) - 2;
-            }
-            return (distance / gap) - 1;
-        }
-    }
+    public int MaxNHouse => gap == 1 ? (roadLenght / gap) - 2 : (roadLenght / gap) - 1;
     
     [HideInInspector]
     public int numberOfHouse = 1;
@@ -54,6 +44,7 @@ public class CityAgent : MonoBehaviour
 
         //Initialize heightmap
         _heightmap = new float[_x, _y];
+        _td.GetHeights(0, 0, _x, _y);
 
         _points = new List<Vector2Int>();
 
@@ -68,12 +59,12 @@ public class CityAgent : MonoBehaviour
         {
             foreach (var point in _points)
             {
-                Gizmos.DrawSphere(GetHeight(point), .2f);
+                Gizmos.DrawSphere(GetPoint(point), .2f);
             }
         }
     }
 
-    private Vector3 GetHeight(Vector2 location)
+    private Vector3 GetPoint(Vector2 location)
     {
         //Create origin for raycast that is above the terrain. I chose 100.
         Vector3 origin = new Vector3(location.x, 100, location.y);
@@ -202,10 +193,10 @@ public class CityAgent : MonoBehaviour
 
         Vector2Int[] points =
         {
-            location + Vector2Int.down * distance,
-            location + Vector2Int.up * distance,
-            location + Vector2Int.right * distance,
-            location + Vector2Int.left * distance
+            location + Vector2Int.down * roadLenght,
+            location + Vector2Int.up * roadLenght,
+            location + Vector2Int.right * roadLenght,
+            location + Vector2Int.left * roadLenght
         };
 
         return points;
@@ -219,9 +210,9 @@ public class CityAgent : MonoBehaviour
 
         Vector2Int[] points = new Vector2Int[3];
 
-        points[0] = location + new Vector2Int((int)dir.x, (int)dir.y) * distance;
-        points[1] = location + new Vector2Int((int)perpendicularDir.x, (int)perpendicularDir.y) * distance;
-        points[2] = location - new Vector2Int((int)perpendicularDir.x, (int)perpendicularDir.y) * distance;
+        points[0] = location + new Vector2Int((int)dir.x, (int)dir.y) * roadLenght;
+        points[1] = location + new Vector2Int((int)perpendicularDir.x, (int)perpendicularDir.y) * roadLenght;
+        points[2] = location - new Vector2Int((int)perpendicularDir.x, (int)perpendicularDir.y) * roadLenght;
 
         return points;
     }
@@ -233,7 +224,7 @@ public class CityAgent : MonoBehaviour
     {
 
         // Check if the location is inside the terrain
-        if (!(location.x >= 0 && location.x <= (_x - 2)) || !(location.y >= 0 && location.y <= (_y - 2)))
+        if (!(location.x > 0 && location.x <= (_x - 2)) || !(location.y > 0 && location.y <= (_y - 2)))
         {
             return false;
         }
@@ -305,8 +296,8 @@ public class CityAgent : MonoBehaviour
 
     private void CreateRoad(Vector2 location, Vector2 prevLocation, Vector3 pos)
     {
-        Vector3 worldLocation = GetHeight(new Vector2(location.x + pos.x, location.y + pos.z));
-        Vector3 prevWorldLocation = GetHeight(new Vector2(prevLocation.x + pos.x, prevLocation.y + pos.z));
+        Vector3 worldLocation = GetPoint(new Vector2(location.x + pos.x, location.y + pos.z));
+        Vector3 prevWorldLocation = GetPoint(new Vector2(prevLocation.x + pos.x, prevLocation.y + pos.z));
 
         Vector3 dir = (worldLocation - prevWorldLocation).normalized;
 
@@ -327,8 +318,8 @@ public class CityAgent : MonoBehaviour
     private void CreateHouse(Vector2 location, Vector2 prevLocation, Vector3 pos)
     {
 
-        Vector3 worldLocation = GetHeight(new Vector2(location.x + pos.x, location.y + pos.z));
-        Vector3 prevWorldLocation = GetHeight(new Vector2(prevLocation.x + pos.x, prevLocation.y + pos.z));
+        Vector3 worldLocation = GetPoint(new Vector2(location.x + pos.x, location.y + pos.z));
+        Vector3 prevWorldLocation = GetPoint(new Vector2(prevLocation.x + pos.x, prevLocation.y + pos.z));
 
         Vector3 dir = (worldLocation - prevWorldLocation).normalized;
 

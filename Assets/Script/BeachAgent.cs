@@ -97,7 +97,7 @@ public class BeachAgent : MonoBehaviour
                     _heightmap[point.y, point.x] = VonNeumannNeighborhood(point);
                 }
 
-                //setting away with a random point in a short distance away from location
+                //setting away with a random point in a short roadLenght away from location
                 Vector2Int away = AwayRandomPoint(location);
 
                 for (int k = 0; k < randomWalkSize; k++)

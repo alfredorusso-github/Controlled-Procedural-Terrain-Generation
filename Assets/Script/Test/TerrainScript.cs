@@ -805,7 +805,7 @@ public class TerrainScript : MonoBehaviour
                 heightmap[(int)point.y, (int)point.x] = VonNeumannNeighborhood(point);
             }
 
-            //setting away with a random point in a short distance away from location
+            //setting away with a random point in a short roadLenght away from location
             Vector2 away = awayRandomPoint(location);
 
             for (int j = 0; j < randomWalkSize; j++)
@@ -867,7 +867,7 @@ public class TerrainScript : MonoBehaviour
                     heightmap[(int)point.y, (int)point.x] = VonNeumannNeighborhood(point);
                 }
 
-                //setting away with a random point in a short distance away from location
+                //setting away with a random point in a short roadLenght away from location
                 Vector2 away = awayRandomPoint(location);
 
                 for (int k = 0; k < randomWalkSize; k++)
@@ -1134,8 +1134,8 @@ public class TerrainScript : MonoBehaviour
         // pos = terrain.GetPosition();
         // positionOnTerrain = GetTerrainPos(pos.x + location.x,  pos.z + location.y);
 
-        // Check if the at squared area starting from location, of the size distance, there are some other houses
-        // Collider [] objects = Physics.OverlapBox(positionOnTerrain, new Vector3(distance, distance, distance), Quaternion.identity);
+        // Check if the at squared area starting from location, of the size roadLenght, there are some other houses
+        // Collider [] objects = Physics.OverlapBox(positionOnTerrain, new Vector3(roadLenght, roadLenght, roadLenght), Quaternion.identity);
         // foreach(var o in objects){
         //     if(o.name == "Cube"){
         //         return false;
