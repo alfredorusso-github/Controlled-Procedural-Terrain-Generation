@@ -16,13 +16,14 @@ public class TreeAgent : MonoBehaviour
     public int agentNr;
     public int token;
     public int returnValue;
+    public int timesSearchingPoint;
     [Range(5, 10)] public int distance;
 
     // Tree prefab 
     public GameObject tree;
 
     // Valid Points
-    List<Vector2Int> _validPoints;
+    private List<Vector2Int> _validPoints;
 
     // OnDrawGizmos
     bool _start;
@@ -77,14 +78,14 @@ public class TreeAgent : MonoBehaviour
         {
             foreach (Vector2Int point in _validPoints)
             {
-                Gizmos.DrawSphere(GetHeight(point), .2f);
+                Gizmos.DrawSphere(GetPoint(point), .2f);
             }
         }
     }
 
-    private Vector3 GetHeight(Vector2 location)
+    private Vector3 GetPoint(Vector2 location)
     {
-        //Create origin for raycast that is above the terrain. I chose 100.
+        //Create origin for raycast that is above the terrain
         Vector3 origin = new Vector3(location.x, _td.size.y + 10, location.y);
 
         //Send the raycast.
@@ -100,10 +101,12 @@ public class TreeAgent : MonoBehaviour
 
         _validPoints = ValidPoints();
 
+        Vector3 terrainPos = _terrain.GetPosition();
+
         for (int i = 0; i < agentNr; i++)
         {
             Vector2Int startingPoint = RandomStartingPoint();
-
+            
             for (int j = 0; j < token; j++)
             {
                 // Setting agent position to the starting point
@@ -112,9 +115,6 @@ public class TreeAgent : MonoBehaviour
                 // Place trees until the return value is reached
                 for (int k = 0; k < returnValue; k++)
                 {
-                    // Place tree
-                    Instantiate(tree, GetHeight(candidate), Quaternion.identity);
-
                     // Check if there is a candidate point where agent can move
                     Vector2Int checkCandidate = GetNearbyPoint(candidate);
                     if (candidate == checkCandidate)
@@ -126,6 +126,9 @@ public class TreeAgent : MonoBehaviour
 
                     // Move agent in random direction in the nearby point
                     candidate = checkCandidate;
+                    
+                    // Place tree
+                    Instantiate(tree, GetPoint(new Vector2(terrainPos.x + candidate.x, terrainPos.z + candidate.y)), Quaternion.identity);
                 }
 
                 yield return new WaitForEndOfFrame();
@@ -184,18 +187,13 @@ public class TreeAgent : MonoBehaviour
 
     private bool CheckSteepness(Vector2 location)
     {
-        //Create origin for raycast that is above the terrain. I chose 100.
+        //Create origin for raycast that is above the terrain.S
         Vector3 origin = new Vector3(location.x, _td.size.y + 10, location.y);
 
         //Send the raycast.
         Physics.Raycast(origin, Vector3.down, out var hit);
 
-        if (Vector3.Angle(hit.normal, Vector3.up) < 15f)
-        {
-            return true;
-        }
-
-        return false;
+        return Vector3.Angle(hit.normal, Vector3.up) < 15f;
     }
 
     private Vector2Int GetNearbyPoint(Vector2Int location)
@@ -206,21 +204,16 @@ public class TreeAgent : MonoBehaviour
 
         foreach (Vector2Int point in _nearbyPoint)
         {
-            if (CheckNearbyPoint(location + point * randomDistance))
+            if (IsValidPoint(location + point * randomDistance))
             {
                 candidates.Add(location + point * randomDistance);
             }
         }
 
-        if (candidates.Count != 0)
-        {
-            return candidates[Random.Range(0, candidates.Count)];
-        }
-
-        return location;
+        return candidates.Count != 0 ? candidates[Random.Range(0, candidates.Count)] : location;
     }
 
-    private bool CheckNearbyPoint(Vector2Int location)
+    private bool IsValidPoint(Vector2Int location)
     {
         // Check if the location is inside the terrain
         if (!(location.x >= 0 && location.x <= (_x - 1)) || !(location.y >= 0 && location.y <= (_y - 1)))
@@ -233,15 +226,10 @@ public class TreeAgent : MonoBehaviour
             return false;
         }
 
-        Vector3 worldLocation = GetHeight(location);
+        Vector3 worldLocation = GetPoint(location);
         int collisions = Physics.OverlapBoxNonAlloc(worldLocation, tree.GetComponent<BoxCollider>().size * .5f,
             new Collider[1], Quaternion.identity, ~LayerMask.GetMask("Terrain"));
         
-        if (collisions > 0)
-        {
-            return false;
-        }
-
-        return true;
+        return collisions == 0;
     }
 }

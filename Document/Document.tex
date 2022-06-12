@@ -335,6 +335,54 @@
     avoiding collision with terrain.
 
     \section{Tree Agent}
+    Tree agent works for placing tree on the landmass. In order to do that the landmass have to be quite flat, so the point considered have not to be so steep. Unless the city agent,
+    this time are allowed point a bit more steep. 
+
+    \subsection{Agent Parameter}
+
+    \begin{itemize}
+        \item \textbf{agentNr:} it is the number of agents which will place tree on the map. Every agent takes care about a specific zone of the map, generating a number of tree
+        according to the parameter specified. It can happen that an agent is placed near a zone where another agent has already worked, in this case the new agent increase
+        zone details.
+        \item \textbf{token:} the number of token represents the number of action which an agent can perform. An action consist of placing a number of tree until the return value
+        isn't reached. Of course while the agent are placing trees it move itself every time towards a random neighboring point according to distance parameter.
+        \item \textbf{returnValue:} this value is used in order to let the agent don't perform a random walk around the map placing tree, but forcing it to work in a specific zone of 
+        the map making it come back periodically to its starting point.
+        \item \textbf{distance:} it is a range between [5, 10] which specifies the maximum distance between one tree and others. Actually, when the agent have to move itself, it uses this
+        parameter in order to understand how much far it has to move, the value is chosen in random way between the lower bound and the upper bound of the chosen range.
+        \item \textbf{tree:} this is the game object used as tree, it is used a real tree model.
+    \end{itemize}
+
+    \subsection{Action}
+    When the action start, heightmap matrix is filled with the value related to the heights of the landmass. Then all valid points are collected using \textbf{ValidPoints} method, see
+    section \ref{section:validPoints}. As it happened for city agent, it is important to retrieve world coordinate for the terrain in order to place trees in the right world point on the terrain.
+
+    Every agent have to be placed on the map and the position will be retrieved thanks to \textbf{RandomStartingPoint} method which return random valid points
+    retrieved by the one previously found. Then the agent work can start. It will return periodically to the starting point just found according to \textbf{returnValue} parameter. 
+
+    When the agent is placed on the map it is used a variable for keeping track its position called \textbf{candidate}, at the beginning it is set to the starting point and
+    every time the agent have to came back to its position it is used. At this point the agent tries to move itself to a valid near point using \textbf{GetNearbyPoint} method, see section \ref{section:nearbyPoint}.
+    If a valid point is found the agent move itself to it and then place a tree, otherwise he come back to its starting point trying to find another way where to place tree. If 
+    no valid points are found the agent work ends.
+
+    Since it is used a unity coroutine every time the agent finish a walk a frame is waited, like at the end of the action.
+
+    \subsection{Valid Points} \label{section:validPoints}
+    This method is responsible to find all valid points on the landmass where it is possible to place the agent. In order to do that, like in the city agent, the first thing checked 
+    is if the height of the point is grater than the average height of the landmass plus 0.05, see section \ref{section: ValidPoints}. Then the other important thing is to check the point
+    steepness. The method \textbf{CheckSteepness} is used and the angle between the normal vector and the up vector is checked. This time, unless the city agent, if the angle is grater
+    than 15-degree the point isn't a valid one. All map points are checked and only valid one are returned.
+
+    \subsection{Get Nearby Point} \label{section:nearbyPoint}
+    Every time the agent have to find a point where it can move itself according to distance parameter specified earlier, a random distance have to be computed between the range specified.
+    Then every point, at direction specified in the \textbf{nearbyPoints} array and at random distance previously computed, is checked with \textbf{IsValidPoint} method. If the point 
+    checked is a valid one it is considered. At the end, a random valid point is returned. It is possible that no valid point can be found, so it is returned the location given in input,
+    in this way the agent can understand that it can't move itself to another point and ends its work.
+    
+    \textbf{IsValidPoint} method check if the candidate point is inside the map and if it is not too steep. When the agent have to place the tree on the map it is important that 
+    the game object doesn't collide with others. This method perform also this check using \textbf{OverlapBoxNonAlloc}, since it is not needed information about collision but only
+    if there is collision or not. In order to perform the previous check it is needed that the game object has a box collider attached to it, since it is used 
+    as measures on how large the space to be controlled must be.
  
     \section{Harbor Agent}
 
