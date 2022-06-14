@@ -16,7 +16,6 @@ public class TreeAgent : MonoBehaviour
     public int agentNr;
     public int token;
     public int returnValue;
-    public int timesSearchingPoint;
     [Range(5, 10)] public int distance;
 
     // Tree prefab 

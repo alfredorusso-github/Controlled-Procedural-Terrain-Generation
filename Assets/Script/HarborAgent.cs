@@ -11,6 +11,7 @@ public class HarborAgent : MonoBehaviour
     private TerrainData _td;
     private int _x;
     private int _y;
+    private Vector3 _terrainPos;
     
     // Agent data
     public int agentNr;
@@ -53,6 +54,7 @@ public class HarborAgent : MonoBehaviour
         _td = _terrain.terrainData;
         _x = _td.heightmapResolution;
         _y = _td.heightmapResolution;
+        _terrainPos = _terrain.GetPosition();
 
         StartCoroutine(Action());
     }
@@ -86,7 +88,7 @@ public class HarborAgent : MonoBehaviour
         
         // List used for keeping truck already visited point for a single agent
         _visitedLocation = new List<Vector2>();
-        
+
         Debug.Log("Starting placing Harbors");
         
         for (int i = 0; i < agentNr; i++)
@@ -100,6 +102,7 @@ public class HarborAgent : MonoBehaviour
             if (location == -Vector2.one)
             {
                 Debug.Log("No more point available where to place harbor...");
+                _visitedLocation.Clear();
                 break;
             }
             
@@ -137,6 +140,38 @@ public class HarborAgent : MonoBehaviour
         Debug.Log("Number of harbor placed: " + harbors.Length);
         
         Debug.Log("Finished placing harbors...");
+    }
+    
+    private List<Vector2> ValidPoints()
+    {
+        List<Vector2> candidates = new List<Vector2>();
+        
+        for (int i = 0; i < _x; i++)
+        {
+            for (int j = 0; j < _y; j++)
+            {
+                Vector2 tmp = new Vector2(i, j);
+                if (GetHeight(tmp) >= .03f && CheckNearPoint(tmp))
+                {
+                    candidates.Add(tmp);
+                }
+            }
+        }
+
+        return candidates;
+    }
+    
+    private bool CheckNearPoint(Vector2 location)
+    {
+        foreach (Vector2 point in _nearbyPoint)
+        {
+            if (IsInsideTerrain(location + point) && GetHeight(location + point) < .03f)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private Vector2 GetStartingPoint(List<Vector2> candidates)
@@ -239,6 +274,7 @@ public class HarborAgent : MonoBehaviour
     private bool CheckLocation(Vector2 location, List<Vector2> candidates)
     {
         int collisions = Physics.OverlapBoxNonAlloc(GetPoint(location), Vector3.one * (harborLenght * .5f), new Collider[1], Quaternion.identity, LayerMask.GetMask("Harbor"));
+        
         if (collisions > 0)
         {
             return false;
@@ -252,12 +288,7 @@ public class HarborAgent : MonoBehaviour
             }
         }
 
-        if (candidates.Count == 0)
-        {
-            return false;
-        }
-
-        return true;
+        return candidates.Count != 0;
     }
     
     private bool CheckNearbyPoint(Vector2 location, Vector2 candidate)
@@ -301,25 +332,6 @@ public class HarborAgent : MonoBehaviour
         return true;
     }
 
-    private List<Vector2> ValidPoints()
-    {
-        List<Vector2> candidates = new List<Vector2>();
-        
-        for (int i = 0; i < _x; i++)
-        {
-            for (int j = 0; j < _y; j++)
-            {
-                Vector2 tmp = new Vector2(i, j);
-                if (GetHeight(tmp) >= .03f && CheckNearPoint(tmp))
-                {
-                    candidates.Add(tmp);
-                }
-            }
-        }
-
-        return candidates;
-    }
-    
     private float GetHeight(Vector2 location)
     {
         //Create origin for raycast that is above the terrain. I chose 200.
@@ -335,32 +347,7 @@ public class HarborAgent : MonoBehaviour
     {
         return new Vector3(location.x, GetHeight(location), location.y);
     }
-    
-    private bool CheckNearPoint(Vector2 location)
-    {
-        Vector2[] nearPoint =
-        {
-            location + Vector2.down,
-            location + Vector2.up,
-            location + Vector2.left,
-            location + Vector2.right,
-            location + Vector2.one,
-            location - Vector2.one,
-            location + new Vector2(1, -1),
-            location + new Vector2(-1, 1)
-        };
 
-        foreach (Vector2 point in nearPoint)
-        {
-            if (IsInsideTerrain(point) && GetHeight(point) < .03f)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-    
     private bool IsInsideTerrain(Vector2 point)
     {
         return point.x >= 0 && point.x <= _x - 1 && point.y >= 0 && point.y <= _y - 1;
@@ -397,15 +384,16 @@ public class HarborAgent : MonoBehaviour
     {
         return Mathf.Pow(Vector2.Distance(point, repulsor), 2.0f) - Mathf.Pow(Vector2.Distance(point, attractor), 2.0f);
     }
-    
+
     private void PlaceHarbor(Vector2 location, List<Vector2> candidates)
     {
         //Debug
         DrawDir(location, candidates);
         _locations.Add(GetPoint(location));
         
-        Vector3 worldLocation = GetPoint(location);
-        Vector3 candidatesWorldLocation = GetPoint(candidates[Random.Range(0, candidates.Count)]);
+        Vector3 worldLocation = GetPoint(new Vector2(_terrainPos.x + location.x, _terrainPos.z + location.y));
+        Vector2 candidate = candidates[Random.Range(0, candidates.Count)];
+        Vector3 candidatesWorldLocation = GetPoint(new Vector2(_terrainPos.x + candidate.x, _terrainPos.z + candidate.y));
 
         Vector3 dir = (candidatesWorldLocation - worldLocation).normalized;
         dir.y = 0;

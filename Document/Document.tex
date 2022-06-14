@@ -14,12 +14,37 @@
 
 \begin{document}
     \maketitle
+    \centering
+    \includegraphics[width=5cm]{images/Pong.png}
     \newpage
     \tableofcontents
     \newpage
     
 
     \section{Introduction}
+    % Procedural content generation (PCG) in games is the algorithmic creation of game content with limited or indirect user input. PCG methods are developed and used
+    % for a number of different reasons, including saving development time and costs, increasing replayability, allowing for adaptive games, assisting designers 
+    % and studying creativity and game design.
+
+    % Some content than others require more time and costs and something like terrain are fundamental in games. 
+    % Terrain are usually handmade, it requires a lot of times and resources, so with PGC it is possible to automate the process and help the designer with their work.
+    % On of the problem of PCG is the controllability of the content generated so, in order to give more control to designers a technique based on software agent is 
+    % used in order to generate terrain. A software agent is an entity capable of understanding surrounding world and taking decision based on this and on the parameters
+    % related to it.
+
+    % 1-definition of PCG   2-usage     3-problem solved    4-more control  5-software agent    6-controlled procedural terrain generation using software agent
+
+    Procedural content generation (PCG) in games is the algorithmic creation of game content with limited or indirect user input. PGC has been used over the year 
+    for helping designer to create content or create it on the fly, since content creation require a lot of times and resources.
+
+    One of the most important content for games is terrain, it is usually handmade, requiring a lot of work and resources for designer. Even in this case PCG help
+    a lot, but don't give so much control to them. In order to avoid this problem a better approach is found, and it is a \textbf{controlled procedural terrain generation
+    using software agent}. A software agent is an entity placed on the map capable of understanding the surrounding world taking decision based on that, related to
+    the work it was meant to do.
+
+    Starting from this information and thanks to the work of Jonathon Doran and Ian Parberry, \cite{article}, I have developed a controlled procedural terrain generator using software 
+    agent, capable of generating an island and add details to it like city, trees and harbor.
+
 
     \section{Coastline Agent}
 
@@ -385,5 +410,124 @@
     as measures on how large the space to be controlled must be.
  
     \section{Harbor Agent}
+    This agent place harbors all around the coastline according to parameters chosen. The harbors are placed at boundary between sea points and beach point. 
+    
+    \subsection{Agent Parameter}
+
+    \begin{itemize}
+        \item \textbf{agentNr:} represent the number of agent which will place harbor on the map.
+        \item \textbf{token:} it is a value related to the number of action performable for a single agent. An action for this kind of agent consist of place a harbor 
+        and move itself to another valid point along the coast.
+        \item \textbf{timesSearchingPoint:} When there are few coastline points where it is possible to place harbor, or when the number of harbor to be placed is bigger than
+        the number of point available, it can happen that the agent isn't able to find a point where it is possible to place a harbor. So in this case, the designer can
+        decide how many times the agent can try to find a valid point.
+        \item \textbf{distance:} it is a range between [5, 50] which represent the minimum distance between two harbors. When the agent have to find another valid point,
+        it moves itself according to this parameter. The agent just move itself through the point until it visited at least a number of point equal to the value of this parameter. 
+        \item \textbf{harborLenght:} this is a range between [5, 15] which represents the maximum value related to the length of the harbor. Its length is chosen randomly
+        according to the range specified.  
+        \item \textbf{harbor:} it is the game object used for representing the harbor. It is used the same prefab used by the city agent for the roads, the only different
+        is the material attached on it which, this time, is gray instead of blue.
+    \end{itemize}
+
+    All the valid points are stored inside a list in order to easily retrieve them when an agent have to be placed on the map, see \ref{section:HarborValidPoints}. Then the 
+    agent have to move itself to the near valid point, but it is needed to avoid coming back to previously visited points and in order to do that it is used another list
+    for keeping track these points related to a single agent.
+    
+    \subsection{Action}
+    The first thing done is retrieving all valid point thanks to the \textbf{ValidPoints} method, see \ref{section:HarborValidPoints}. Then it is tried to find a point where it is possible to
+    place the agent using \textbf{GetStartingPoint} method, see section \ref{section:harborStartingPoint}. If it is impossible to find point means that no more points are available to place
+    the harbor, so the agent work ends. If a point is found the first harbor is placed. The agent have to move itself following the coast, for this an attractor and a repulsor
+    point are used for scoring the best point in which to move, see section \ref{section:attractor}.
+    
+    Since the first harbor is usually placed when the agent is placed on the map, the agent have to place a number of harbors equal to the number of tokens minus 1. Then a 
+    location where the agent can move is searched. If it is found, a harbor is placed, otherwise a placeholder value is returned in order to communicate that near valid point
+    isn't available, so the agent is moved to a random coastline point.
+
+    After an agent ends its work, the list used for keeping track of the already visited point is clean, since it is related to a single agent.
+
+    \subsection{Valid Points} \label{section:HarborValidPoints}
+    A valid point is a point where its height is greater than 0.03 and if there is at least one near point which respect some constraints, these are checked thanks to
+    \textbf{CheckNearPoint} method. This method check if the point given in input is inside the terrain and if its height is less than 0.03. In this way, it is possible to
+    retrieve all the beach points which are next to a sea point.
+
+    \subsection{Get Starting Point} \label{section:harborStartingPoint}
+    This method receive in input a list of Vector2 called candidates in order to understand if the nearby points are valid ones, see seciton \ref{section:harborNearby}. Since the list 
+    used is a list of object the value are in the heap, so it is not needed to return this as parameter in order to preserve the value.
+
+    The first thing done is to retrieve a random coastline location using the method \textbf{RandomPoint} which return a random point from the coastline points list previously
+    filled, see section \ref{section:HarborValidPoints}. If the location is a good one it is returned, otherwise it is retrieved another random coastline point until a good
+    location is found or the number of time which is possible to try to find a point (specified by \textbf{timesSearchingPoint} parameter) is expired.
+    This check is done using \textbf{CheckLocation} method, see section \ref{harbor:checkLocation}. At the end, If no point is found a placeholder value is returned in order 
+    to communicate that it isn't possible to find a valid starting point.
+
+    \subsection{Check Location} \label{harbor:checkLocation}
+    This method is used for checking if the location given in input is a good location where to place a harbor or not. The first thing to check is whether, in a squared area
+    as big as the harbor length, there is another harbor or not, if it is, the point considered is not a valid one. Then it is needed to check all surrounding point of the 
+    one given in input and try to find a direction in which is possible to place the harbor, see section \ref{section:harborNearby}.
+
+    Here, the list which represents the candidate point is filled with the valid surrounding point of the location given in input, if there are. It is not needed to return it,
+    since it is located on the heap and its values are preserved. 
+    
+    \subsection{Check Nearby Point} \label{section:harborNearby}
+    This method receives two input, the location and a candidate point which is one of the point surrounding location called candidate. The first thing checked is
+    if the candidate is a sea point, so if its height is equal to 0. In order to place the harbor, it is important to check all the point along the direction defined by those
+    two point and their right and left points. The number of points to check along that direction are equal to the maximum harbor length, since at this time the length for 
+    a harbor isn't decided yet.
+
+    For every point along the direction it is checked if the point is inside terrain, if it is a sea point and if its right and left points are a sea one. This is done
+    retrieving the information about their height. The last thing checked is if there is already another harbor placed along the direction previously mentioned.
+    % This list is 
+    % used by every method which uses this, actually they are \textbf{FindNewLocation} (see section \ref{section:harborNew}) and \textbf{GetStartingPoint} (see section \ref{section:harborStartingPoint}).
+
+    \subsection{Find New Location} \label{section:harborNew}
+    It takes in input the location, attractor and repulsor point. The agent have to move itself through a number of points according to \textbf{distance} parameter. In order
+    to do that every time it tries to move itself to a nearby point using \textbf{NewLocation} method, see section \ref{section:HarborNewLocation}. If it is able to move itself to a
+    nearby point the new point visited is added to the related list for keeping track of it, otherwise the agent is moved to another random beach point near the sea, hoping
+    it is retrieved a good one.
+
+    After the agent moved itself through a number point related to the parameter previously specified, it is possible that the point found isn't a valid one since it can be another
+    harbor near the point found or there is no valid direction where to place it. In this case, the agent keep searching for a valid point according to \textbf{timesSearchingPoint}
+    parameter. If the agent find a point where it is possible to place harbor, it is placed thanks to \textbf{PlaceHarbor} method, see section \ref{section:PlaceHarbor} and the 
+    point found is returned. If, during agent movement, it is unable to move itself to a nearby point it is moved to a random point and a walk is performed trying to find a 
+    good point. 
+
+    At the end if no point is found means that points available where to place harbor are very few or there none at all. So a placeholder value is returned for communicate this.
+
+    \subsection{New Location} \label{section:HarborNewLocation}
+    This method is used for retrieve a surrounding point related to the location given in input exploiting attractor and repulsor point. A surrounding point is a valid one if
+    it is inside the terrain, if its height is greater or equal than 0.03, if it is a beach point next to the sea and if it isn't a point already visited by the agent.
+    The third check is done using \textbf{CheckNearPoint} method, see section \ref{section:harborStartingPoint}. 
+
+    If not a single point is found the agent isn't able to move itself, so a placeholder value is returned in order to communicate that. Otherwise, all candidates point found must
+    be scored, see section \ref{section:attractor}. Then the point with the highest score is returned.
+
+    \subsection{Attractor, repulsor and how to score} \label{section:attractor}
+    The \textbf{GetAttractor} method is the one responsible to retrieve the attractor point, it easily returns a random point inside the map. Since attractor and repulsor point
+    have to be in different direction, \textbf{GetRepulsor} retrieve a random point inside the map and check if its direction is different from the attractor one. While they have 
+    the same direction, a new random repulsor point is retrieved. The direction previously mentioned are the one from location to the attractor/repulsor.
+
+    Those two point are used for scoring candidate points, so the points closer to the attractor are scored higher than the ones closer to the repulsor. A point is scored 
+    according to the following rule:
+
+    \begin{equation}
+        score = d(p, r)^2 - d(p, a)^2
+    \end{equation}
+
+    \noindent
+    Where d(p, r) is the distance between the point and the repulsor and d(p, a) is the distance between the point and the repulsor.
+
+    \subsection{Place Harbor} \label{section:PlaceHarbor}
+    This method takes in input the location where to place the harbor and a nearby sea point in order to calculate a direction useful for harbor rotation.
+    
+    The first thing done is to retrieve the world coordinate for the points given in input, so the location and the candidate. Then a direction from the location to the 
+    candidate is calculated as well as the rotation using \textbf{Quaternion.LookRotation} which inputs are the direction just mentioned and the vector up. A random value 
+    related to the harbor length is computed and with this value the scaling vector is created. At the end the harbor is instantiated at world coordinate of location with 
+    the rotation previously computed, then it is scaled and translated by half of its length forward. This is done because the center of the harbor is at middle of the game
+    object, so in order to avoid placing half harbor on the beach.
+
+    \section{Overall Results}
+
+    \bibliographystyle{unsrtnat}
+    \bibliography{bibliography.bib}
 
 \end{document}
