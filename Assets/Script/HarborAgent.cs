@@ -99,14 +99,14 @@ public class HarborAgent : MonoBehaviour
     public IEnumerator Action()
     {
         // Debug
-        // _start = true;
+        _start = true;
         
         // All coastline points
         _coastlinePoints = ValidPoints();
         
         // List used for keeping truck already visited point for a single agent
         _visitedLocation = new List<Vector2>();
-
+        
         Debug.Log("Starting placing Harbors");
         
         for (int i = 0; i < agentNr; i++)
@@ -127,11 +127,11 @@ public class HarborAgent : MonoBehaviour
             //Place the harbor
             PlaceHarbor(location, candidates);
             Physics.SyncTransforms();
-
+        
             // variable used for scoring point in order to have the agent moving in a certain direction 
             Vector2 attractor = GetAttractor();
             Vector2 repulsor = GetRepulsor(attractor, location);
-
+        
             for (int j = 0; j < token - 1; j++)
             {
                 // Move agent to the new location and place harbor
@@ -146,10 +146,10 @@ public class HarborAgent : MonoBehaviour
             }
             
             _visitedLocation.Clear();
-
+        
             yield return new WaitForEndOfFrame();
         }
-
+        
         Debug.Log("Visited point: " + _visitedPoint.Count);
 
         yield return new WaitForEndOfFrame();
@@ -353,7 +353,7 @@ public class HarborAgent : MonoBehaviour
     private float GetHeight(Vector2 location)
     {
         //Create origin for raycast that is above the terrain. I chose 200.
-        Vector3 origin = new Vector3(location.x, 200, location.y);
+        Vector3 origin = new Vector3(location.x + _terrainPos.x, 200, location.y + _terrainPos.z);
 
         //Send the raycast.
         Physics.Raycast(origin, Vector3.down, out var hit, Mathf.Infinity, LayerMask.GetMask("Terrain"));
@@ -363,7 +363,7 @@ public class HarborAgent : MonoBehaviour
     
     private Vector3 GetPoint(Vector2 location)
     {
-        return new Vector3(location.x, GetHeight(location), location.y);
+        return new Vector3(location.x + _terrainPos.x, GetHeight(location), location.y + _terrainPos.z);
     }
 
     private bool IsInsideTerrain(Vector2 point)
@@ -406,12 +406,11 @@ public class HarborAgent : MonoBehaviour
     private void PlaceHarbor(Vector2 location, List<Vector2> candidates)
     {
         //Debug
-        // DrawDir(location, candidates);
+        DrawDir(location, candidates);
         _locations.Add(GetPoint(location));
         
-        Vector3 worldLocation = GetPoint(new Vector2(_terrainPos.x + location.x, _terrainPos.z + location.y));
-        Vector2 candidate = candidates[Random.Range(0, candidates.Count)];
-        Vector3 candidatesWorldLocation = GetPoint(new Vector2(_terrainPos.x + candidate.x, _terrainPos.z + candidate.y));
+        Vector3 worldLocation = GetPoint(new Vector2(location.x, location.y));
+        Vector3 candidatesWorldLocation = GetPoint(candidates[Random.Range(0, candidates.Count)]);
 
         Vector3 dir = (candidatesWorldLocation - worldLocation).normalized;
         dir.y = 0;
