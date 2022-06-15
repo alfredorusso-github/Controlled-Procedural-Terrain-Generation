@@ -138,6 +138,8 @@ public class BeachAgent : MonoBehaviour
         Debug.Log("Finish generating beach...");
 
         SplatMap.Instance.MakeSplatMap();
+
+        yield return CityAgent.Instance.Action();
     }
     
     private List<Vector2Int> GetShorelinePoints()

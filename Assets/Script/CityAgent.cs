@@ -26,12 +26,27 @@ public class CityAgent : MonoBehaviour
     [HideInInspector]
     public int numberOfHouse = 1;
 
-    // Instance of this class
-    public static CityAgent Instance;
-
     // OnDrawGizmos
     private List<Vector2Int> _points;
     private bool _start;
+    
+    // Instance of this class
+    public static CityAgent Instance;
+    
+    private void Awake()
+    {
+
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+    }
 
     void Start()
     {
@@ -44,11 +59,10 @@ public class CityAgent : MonoBehaviour
 
         //Initialize heightmap
         _heightmap = new float[_x, _y];
-        _td.GetHeights(0, 0, _x, _y);
 
         _points = new List<Vector2Int>();
 
-        StartCoroutine(Action());
+        // StartCoroutine(Action());
     }
 
     private void OnDrawGizmos()
@@ -75,7 +89,7 @@ public class CityAgent : MonoBehaviour
         return hit.point;
     }
 
-    private IEnumerator Action()
+    public IEnumerator Action()
     {
         _heightmap = _td.GetHeights(0, 0, _x, _y);
 

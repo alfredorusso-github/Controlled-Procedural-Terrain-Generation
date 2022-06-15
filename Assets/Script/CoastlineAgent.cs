@@ -139,7 +139,7 @@ public class CoastlineAgent : MonoBehaviour
             {
                 List<Vector2> candidates = NearPoints(location);
 
-                if (candidates.Count == 0)
+                while (candidates.Count == 0)
                 {
                     location = FindCoastlinePoint(agent);
                     candidates = NearPoints(location);
@@ -165,7 +165,7 @@ public class CoastlineAgent : MonoBehaviour
 
     private Vector2 GetStartingPoint()
     {
-        return startingFromMapCenter ? new Vector2(_x * .5f, _y * .5f) : new Vector2(Random.Range(0, _x), Random.Range(0, _y));
+        return startingFromMapCenter ? new Vector2((_x - 1) * .5f, (_y - 1) * .5f) : new Vector2(Random.Range(0, _x), Random.Range(0, _y));
     }
     
     private Vector2 FindCoastlinePoint(Agent agent)

@@ -7,6 +7,7 @@
 \usepackage{subfigure}
 \usepackage{amssymb}
 \usepackage{hyperref}
+\usepackage{float}
 
 
 \begin{document}
@@ -228,6 +229,37 @@
     In order to check if a point is inside the terrain it is used the method called \textbf{IsInsideTerrain} that check if the coordinate of the point are between the range 0 and
     the limit of the map.
 
+    \subsection{Results}
+    Below there are some examples of the result achieved and the related configuration about parameters.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.8]{images/Smoothing agent/256 agenti/Parameters}
+        \caption{Parameters used for the following results (256 agents generated).}
+        \label{fig:smoothingParam}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.3]{images/Smoothing agent/256 agenti/1}
+        \caption{First results.}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering     %%% not \center
+        \subfigure[]{\includegraphics[width=60mm]{images/Smoothing agent/256 agenti/2}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Smoothing agent/256 agenti/3}}
+        \caption{Second results.}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.3]{images/Smoothing agent/256 agenti/4}
+        \caption{Third result (it doesn't start from map center).}
+    \end{figure}
+
+    \newpage
+
     \section{Beach Agent}
     This agent start its work after smoothing agent ends its own. In order to do that it is used an instance of the agent that allow to start the action after smoothing agent end its work.
     Beach agent has the work to generate beach according to the parameter chosen by the designer.
@@ -244,11 +276,12 @@
         and move to another random shoreline point.
         \item \textbf{randomWalkSize:} when the agent is placed on a random shoreline point it jumps away from it changing the height of
         the point and smoothing them according to the parameters specified. How long will be its walk is specified by randomWalkSize parameter.
-        \item \textbf{awayLimit:} when the agent have to jump away from the coastline it is needed to know how much far the agent have to jump away.
+        \item \textbf{awayLimit:} when the agent have to jump away from the coastline it is needed to know how much far.
         So the awayLimit parameter it is really important since it specify that information.
         \item \textbf{beachHeight:} it is a range between [0.003, 0.01[ that represent beach height. Actually, in Unity, we are working with heightmap
         matrix where the heights are mapped inside the range 0-1. So the value previously written have to be multiplied by the maximum height of the 
-        unity terrain. If the maximum height of the unity terrain is 100, the range previously specified becomes [0.3, 1[.
+        unity terrain. If the maximum height of the unity terrain is 100, the range previously specified becomes [0.3, 1[. The more the range is narrow,
+        the most the beach will be flat.
     \end{itemize}
 
     \subsection{Action}
@@ -295,6 +328,42 @@
     to retrieve a point away from the coast and check if it is inside the terrain and its height is less than 0.01. It will be for sure a point away starting
     from the one given in input because every shoreline point can be called like this only if it allows jumping away from it. This check is done by 
     \textbf{GetShorelinePoints} method.
+
+    \subsection{Results}
+    Below there are some examples of the result achieved and the related configuration about parameters.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.8]{images/Beach agent/Parameters 1}
+        \caption{Parameters used for the following results.}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering     %%% not \center
+        \subfigure[]{\includegraphics[width=60mm]{images/Beach agent/1}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Beach agent/2}}
+        \caption{First results.}
+        \label{fig:beachNotFlat}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.8]{images/Beach agent/Parameters 2}
+        \caption{Parameters used for the following results.}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering     %%% not \center
+        \subfigure[]{\includegraphics[width=60mm]{images/Beach agent/4}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Beach agent/3}}
+        \caption{First results.}
+        \label{fig:beachFlat}
+    \end{figure}
+
+    As you can see, if the value related to the height of the beach is narrow the beach generated is flat, see \ref{fig:beachFlat}. Otherwise, the beach presents
+    some fluctuation, see \ref{fig:beachNotFlat}.
+
+    \newpage
 
     \section{City Agent}
     City agent is responsible to create road and house on the coastline previously created by other agents. This agent can work only if the landmass generated
@@ -431,6 +500,36 @@
     the new position is calculated exploiting the directions previous mentioned according to the gap parameter. Since, as house, it is used a cube, all of them are translated 0.5 upward
     avoiding collision with terrain.
 
+    \subsection{Results}
+    Below there are some examples of the result achieved and the related configuration about parameters.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.8]{images/City Agent/1/Parameters}
+        \caption{Parameters used for the following results.}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering     %%% not \center
+        \subfigure[First result]{\includegraphics[width=80mm]{images/City Agent/1/1}}
+        \subfigure[Second result]{\includegraphics[width=80mm]{images/City Agent/1/2}}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.8]{images/City Agent/2/Parameters}
+        \caption{Parameters used for the following results.}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering     %%% not \center
+        \subfigure[First result]{\includegraphics[width=60mm]{images/City Agent/2/1}}
+        \subfigure[Second result]{\includegraphics[width=60mm]{images/City Agent/2/2}}
+        \subfigure[Third result]{\includegraphics[width=60mm]{images/City Agent/2/3}}
+    \end{figure}
+
+    \newpage
+
     \section{Tree Agent}
     Tree agent works for placing tree on the landmass. In order to do that the landmass have to be quite flat, so the point considered have not to be so steep. Unless the city agent,
     this time are allowed point a bit more steep. 
@@ -480,6 +579,37 @@
     the game object doesn't collide with others. This method perform also this check using \textbf{OverlapBoxNonAlloc}, since it is not needed information about collision but only
     if there is collision or not. In order to perform the previous check it is needed that the game object has a box collider attached to it, since it is used 
     as measures on how large the space to be controlled must be.
+
+    \subsection{Results}
+    Below there are some examples of the result achieved and the related configuration about parameters.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.8]{images/Tree agent/1/Parameters}
+        \caption{Parameters used for the following results.}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering     %%% not \center
+        \subfigure[First result]{\includegraphics[width=60mm]{images/Tree agent/1/1}}
+        \subfigure[Second result]{\includegraphics[width=60mm]{images/Tree agent/1/2}}
+        \subfigure[]{\includegraphics[width=80mm]{images/Tree agent/1/3}}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.8]{images/Tree agent/2/Parameters}
+        \caption{Parameters used for the following results.}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering     %%% not \center
+        \subfigure[First result]{\includegraphics[width=60mm]{images/Tree agent/2/1}}
+        \subfigure[Second result]{\includegraphics[width=60mm]{images/Tree agent/2/2}}
+        \subfigure[]{\includegraphics[width=80mm]{images/Tree agent/2/3}}
+    \end{figure}
+
+    \newpage
  
     \section{Harbor Agent}
     This agent place harbors all around the coastline according to parameters chosen. The harbors are placed at boundary between sea points and beach point. 
@@ -597,7 +727,61 @@
     the rotation previously computed, then it is scaled and translated by half of its length forward. This is done because the center of the harbor is at middle of the game
     object, so in order to avoid placing half harbor on the beach.
 
+    \subsection{Results}
+    Below there are some examples of the result achieved and the related configuration about parameters.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.8]{images/Harbor agent/Parameters 1}
+        \caption{Parameters used for the following results.}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.3]{images/Harbor agent/1}
+        \caption{First result.}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.8]{images/Harbor agent/Parameters 2}
+        \caption{Parameters used for the following results.}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale = 0.3]{images/Harbor agent/2}
+        \caption{Second result.}
+    \end{figure}
+
+    \newpage
+
     \section{Overall Results}
+    In this section there are some result obtained after all agents have finished their work.
+
+    \begin{figure}[H]
+        \centering     %%% not \center
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/1/1}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/1/2}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/1/3}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/1/4}}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering     %%% not \center
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/2/1}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/2/2}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/2/3}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/2/4}}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering     %%% not \center
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/3/1}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/3/2}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/3/3}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/3/4}}
+    \end{figure}
 
     \newpage
     \bibliographystyle{unsrtnat}

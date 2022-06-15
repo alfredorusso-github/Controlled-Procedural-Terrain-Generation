@@ -47,6 +47,24 @@ public class HarborAgent : MonoBehaviour
         new Vector2(1, -1)
     };
     
+    // Instance of this class
+    public static HarborAgent Instance;
+
+    private void Awake()
+    {
+
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+    }
+    
     void Start()
     {
         // Getting terrain information
@@ -56,7 +74,7 @@ public class HarborAgent : MonoBehaviour
         _y = _td.heightmapResolution;
         _terrainPos = _terrain.GetPosition();
 
-        StartCoroutine(Action());
+        // StartCoroutine(Action());
     }
 
     private void OnDrawGizmos()
@@ -78,10 +96,10 @@ public class HarborAgent : MonoBehaviour
         }
     }
 
-    private IEnumerator Action()
+    public IEnumerator Action()
     {
         // Debug
-        _start = true;
+        // _start = true;
         
         // All coastline points
         _coastlinePoints = ValidPoints();
@@ -388,7 +406,7 @@ public class HarborAgent : MonoBehaviour
     private void PlaceHarbor(Vector2 location, List<Vector2> candidates)
     {
         //Debug
-        DrawDir(location, candidates);
+        // DrawDir(location, candidates);
         _locations.Add(GetPoint(location));
         
         Vector3 worldLocation = GetPoint(new Vector2(_terrainPos.x + location.x, _terrainPos.z + location.y));
