@@ -236,11 +236,6 @@ public class CoastlineAgent : MonoBehaviour
 
     private bool IsInsideTerrain(Vector2 point)
     {
-        if (point.x >= 0 && point.x < _x  && point.y >= 0 && point.y < _y)
-        {
-            return true;
-        }
-
-        return false;
+        return point.x >= 0 && point.x < _x  && point.y >= 0 && point.y < _y;
     }
 }

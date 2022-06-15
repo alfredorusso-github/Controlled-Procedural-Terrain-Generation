@@ -8,15 +8,15 @@
 \usepackage{amssymb}
 \usepackage{hyperref}
 
-\title{Controlled Procedural Terrain Generation}
-\author{Alfredo Russo}
-\date{A.A. 2021-2022}
 
 \begin{document}
+
+    \title{Controlled Procedural Terrain Generation}
+    \author{Alfredo Russo}
+    \date{A.A. 2021-2022}
     \maketitle
-    \centering
-    \includegraphics[width=5cm]{images/Pong.png}
     \newpage
+    
     \tableofcontents
     \newpage
     
@@ -43,10 +43,82 @@
     the work it was meant to do.
 
     Starting from this information and thanks to the work of Jonathon Doran and Ian Parberry, \cite{article}, I have developed a controlled procedural terrain generator using software 
-    agent, capable of generating an island and add details to it like city, trees and harbor.
+    agent, capable of generating an island and add details to it like city, trees and harbors.
 
+    \newpage
 
     \section{Coastline Agent}
+    At beginning there is a big ocean, so all the map points are sea points, then the first agent which work on the map is the coastline agent which is responsible for 
+    generating the entire landmass. Its work consist of elevating a number of vertices related to the parameter specified by the designer or subdivide itself in two agents
+    until a single agent work with a small number of vertices. How much small the number of vertices is can be decided by designers.
+
+    \subsection{Agent parameter}
+    To a coastline agent are associated some information like the number of vertices it has to work with and a preferred direction. In order to store this information is used
+    a struct which represents an entity of the coastline agent. 
+
+    \begin{itemize}
+        \item \textbf{startingFromMapCenter:} this is a boolean value which can be use by designer for specifying if the agent have to start its work from the map center or
+        from a random point inside the map.
+        \item \textbf{coastlineTokens:} it represents the number of action performable by the agent which consist of move itself to a valid point and elevated this point. 
+        The number of tokens is directly related to the number of point the agent have to generate.
+        \item \textbf{vertexLimit:} At the beginning, a single coastline agent is responsible for the entire landmass. Since a single agent have to work with a small number
+        of vertex, it has to divide itself. This parameter allows designers to decide with how many vertices a single agent have to work with. Until the agent doesn't
+        work with a number of vertices less or equal than the value specified it continue to divide itself.
+        \item \textbf{maxHeight:} this is a range between [0.03, 1] which represent the max height of the vertices elevated by the agent. Unity terrain has a parameter which 
+        represent the maximum height of it (it is possible to change it). For keeping track of the height of the points it is used a heightmap which maps that value inside 
+        the range [0, 1].
+    \end{itemize}
+
+    The agent divide itself according to the \textbf{vertexLimit} parameter, it is used a queue for storing all the agent which will work on the map. 
+    Every time the agent have to be placed on the map, except for the first time, they have to be placed on an already elevated point so a hashset with all coastline point
+    (point which height is different from 0) is used. For checking if it is the absolute first time an agent is placed on the map it is used a boolean parameter. 
+
+    \subsection{Agent division}
+    The first agent is instantiated giving him a number of vertices equal to all the vertices of the map and a preferred direction. Then thanks to the method \textbf{GetCoastlineAgent},
+    it is checked if the agent has a number of vertices on which he has to work less than the \textbf{vertexLimit} parameter. If not, the agent is divided in two with half
+    of vertices than the parent and a randomly preferred direction. Otherwise, the agent is added to the queue previously mentioned.  
+
+    The number of vertices elevated at the end of the work of all agent is given by:
+
+    \begin{equation}
+        vertices = coastlineTokens * agentNr
+    \end{equation}
+
+    \noindent
+    So if the number of vertices that will be elevated is greater than the number of vertices of the map it is impossible to perform the action.
+
+    \subsection{Action}
+    Action is a method which duration depends on the number of the agent present in the queue and the number of token for each agent. The first thing done is getting an agent
+    from the queue and place it on the map. If it is the first time an agent is placed on the map, the position is computed using the method \textbf{GetStartingPoint}, see 
+    section \ref{coastline:StartingPoint}. Otherwise, it is computed with \textbf{FindCoastlinePoint} method, see section \ref{coastline:FindCoastlinePoint}. The location variable is used for keeping
+    track the position of the agent.
+
+    Then the agent start searching for nearby valid points using the \textbf{NearPoint} method, which check if the points surrounding location are inside the terrain and if its
+    height is equal to 0, so if they are sea points. If no point is found means that all the nearby point are already elevated or not valid,
+    so the agent is moved to a random coastline point. When there is at least one valid point near to the agent position, it moves to that point and elevates it with a random
+    value between the range [0.03, maxHeight]. If there are more than one point where the agent can move, the position where it will move itself is chosen randomly.
+
+    All the point elevated are added to the hashset in order to easily place the agent on the map and let him searching for a valid point.
+
+    \subsection{Get Starting Point} \label{coastline:StartingPoint}
+    The value returned by this method depends on if the designer want the agent work starting from the map center or not, according to \textbf{startingFromMapCenter}
+    parameter. If it is, the map center is returned, it is computed starting from the value related to the width and height of the unity terrain. Otherwise, a random
+    point inside the map is returned, it will be the center of the landmass generated.
+
+    \subsection{Find Coastline Point} \label{coastline:FindCoastlinePoint}
+    This method is used for move the agent to a coastline point near to the sea. It takes in input the agent itself, since the agent is moved according to its preferred
+    direction. In order to check if a valid point is found it is used \textbf{CheckNearPoint} method, see section \ref{coastline:CheckNearPoint}.
+
+    The first thing done is to retrieve a random coastline point where to place the agent thanks to \textbf{RandomPoint} method, which easily return a point inside the hashset containing all 
+    coastline points. Until a valid point isn't found, the agent is moved in its preferred direction.  Since it is possible that the center of the landmass isn't the center
+    of the map, it can happen that agent preferred direction lead it outside the map. If it is the case, the agent is repositioned to the starting point where it was placed and 
+    it starts searching in the opposite direction than its preferred one.
+
+    At the end of this method, it is always found a valid point.
+
+    \subsection{Check Near Point} \label{coastline:CheckNearPoint}
+    It is used for checking if there is at least one sea point near the location given in input. Starting from the location it checks if the surrounding points are inside
+    the terrain and if their height is equal to 0.
 
     \section{Smoothing Agent}
     Smoothing agent is the one which deals with smoothing points previously elevated by the coastline agent.
@@ -527,6 +599,7 @@
 
     \section{Overall Results}
 
+    \newpage
     \bibliographystyle{unsrtnat}
     \bibliography{bibliography.bib}
 
