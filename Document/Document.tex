@@ -51,7 +51,7 @@
     \section{Coastline Agent}
     At beginning there is a big ocean, so all the map points are sea points, then the first agent which work on the map is the coastline agent which is responsible for 
     generating the entire landmass. Its work consist of elevating a number of vertices related to the parameter specified by the designer or subdivide itself in two agents
-    until a single agent work with a small number of vertices. How much small the number of vertices is can be decided by designers.
+    until a single agent work with a small number of vertices. How much small the number of vertices can be decided by designers.
 
     \subsection{Agent parameter}
     To a coastline agent are associated some information like the number of vertices it has to work with and a preferred direction. In order to store this information is used
@@ -76,7 +76,7 @@
 
     \subsection{Agent division}
     The first agent is instantiated giving him a number of vertices equal to all the vertices of the map and a preferred direction. Then thanks to the method \textbf{GetCoastlineAgent},
-    it is checked if the agent has a number of vertices on which he has to work less than the \textbf{vertexLimit} parameter. If not, the agent is divided in two with half
+    it is checked if the agent has a number of vertices on which he has to work, less than the \textbf{vertexLimit} parameter. If not, the agent is divided in two with half
     of vertices than the parent and a randomly preferred direction. Otherwise, the agent is added to the queue previously mentioned.  
 
     The number of vertices elevated at the end of the work of all agent is given by:
@@ -163,7 +163,7 @@
 
     In order to understand when the agent have to return to its starting point it is used a counter (\textbf{count}) originally set to 0;
     
-    It is important to track the position of every agent and for this is used a variable called \textbf{location} that it is updated during time with the current agent position. 
+    It is important to track the position of every agent and for this is used a variable called \textbf{location} that is updated during time with the current agent position. 
     At the beginning it is set to the value of the starting point.
 
     Every agent can perform an action according to the number of the tokens specified. The action can consist of came back to the starting point or change the height of a point
@@ -275,7 +275,7 @@
         \item \textbf{heightLimit:} it is the altitude limit, when the agent reaches a point higher than the limit specified, it leaves the area
         and move to another random shoreline point.
         \item \textbf{randomWalkSize:} when the agent is placed on a random shoreline point it jumps away from it changing the height of
-        the point and smoothing them according to the parameters specified. How long will be its walk is specified by randomWalkSize parameter.
+        the point and smoothing them according to the parameters specified. How long will be its walk is specified by this parameter.
         \item \textbf{awayLimit:} when the agent have to jump away from the coastline it is needed to know how much far.
         So the awayLimit parameter it is really important since it specify that information.
         \item \textbf{beachHeight:} it is a range between [0.003, 0.01[ that represent beach height. Actually, in Unity, we are working with heightmap
@@ -285,7 +285,7 @@
     \end{itemize}
 
     \subsection{Action}
-    Before starting beach agent action, the heightmap matrix have to be filled with the value related to the points' height of unity terrain.
+    Before the beach agent action can start, the heightmap matrix have to be filled with the value related to the points' height of unity terrain.
     
     \noindent
     After the smoothing agent action, it can happen that there are points with height between 0 and 0.003 which are neither sea point nor beach point. In 
@@ -299,24 +299,24 @@
     After the agent is placed on the map it can start its work. The first things to do is to check if the location has an height value greater than the \textbf{heightLimit}.
     If it is, the agent have to be replaced on the map and its location is changed to another random shoreline point.
     
-    Then location point and the surrounding points are flattened and this means that a random height value between the \textbf{beachHeight} range is assigned
+    Then location and its surrounding points are flattened and this means that a random height value between the \textbf{beachHeight} range is assigned
     to them. After these points are smoothed using Von Neumann Neighborhood, see section \ref{section:Von Neumann}.
 
     Then the agent move itself to a random point away from the coast using \textbf{AwayRandomPoint} method. The new point is stored inside a different variable
-    than location since after the agent ends its random walk, it has to came back to the location and move itself to another shoreline point near location.
+    than location since after the agent ends its random walk, it has to came back to the location and move itself to another shoreline point near it.
 
     Now the agent is ready to start its random walk which duration depends on the parameter \textbf{randomWalkSize}. The agent start to flatten and smooth the away point
     and its neighboring point and only after it moves itself to a valid neighboring point exploiting \textbf{GetNeighboringPoint} method. A point is a valid one if it is 
     inside the map and its height is less than 0.01. It is possible that no valid point near the current position of the agent is found, if it happens means that the 
-    agent isn't able to move itself to another point, so its random walk ends. For checking this, it is used a placeholder parameter which is the value Vector2Int.one.
+    agent isn't able to move itself to another point, so its random walk ends. For checking this, it is used a placeholder parameter which is the value -Vector2Int.one.
 
-    When the agent random walk ends the agent move itself to a new shoreline point near the shoreline point where it was before, assigning the new value to the 
+    When the agent random walk ends, it moves to a new shoreline point near the shoreline point where it was before, assigning the new value to the 
     location variable.
 
     \subsection{CheckShorelinePoint}
-    This method is used by \textbf{GetShorelinePoints} one in order to check if a point is a shoreline one or not. It returns true if the point has an height value
-    between the range [0.003, 0.01[. This range was chosen so the points retrieved are point quite close to the sea. Another thing to check by this method is
-    if the coordinate of the point plus the away limit are inside the map or not, in order to understand if the agent starting from this point is able to jump away from it.
+    This method is used by \textbf{GetShorelinePoints} one in order to check if a point is a shoreline one or not. It returns true if the point has a height value
+    between the range [0.003, 0.01[. This range was chosen because in this way the points retrieved are point quite close to the sea. Another thing to check by this method is
+    if the coordinate of the point plus the away limit are inside the map or not, in order to understand if the agent starting from its position is able to jump away from it.
 
     \subsection{GetNeighboringPoint}
     This method is used in order to retrieve a position where the agent can move itself exploiting \textbf{GetNeighboringPoints} method which return all
@@ -366,15 +366,15 @@
     \newpage
 
     \section{City Agent}
-    City agent is responsible to create road and house on the coastline previously created by other agents. This agent can work only if the landmass generated
+    City agent is responsible to create roads and houses on the coastline previously created by other agents. This agent can work only if the landmass generated
     is quite flat. 
 
     \subsection{Agent Parameter}
     \begin{itemize}
         \item \textbf{cityAgentNr:} it is the number of agent which will create the city. Every agent is responsible to create a city zone, the more this 
-        number is high, the more the number of city zone will be. Depending on how much the landmass generated is big and how many points where to place road
-        and house there are, an agent can add details to a zone previously generated by other agents.
-        \item \textbf{cityTokens:} it is the number of action performable by the agent. An action for the agent is moving itself to a valid point and place road 
+        number is high, the more the number of city zone will be. Depending on how much the landmass generated is big and how many points where to place roads
+        and houses there are, an agent can add details to a zone previously generated by other agents.
+        \item \textbf{cityTokens:} it is the number of action performable by the agent. An action for the agent is moving itself to a valid point and place a road 
         and houses according to the following parameter.
         \item \textbf{roadGameObject:} it is the game object that represent the road. It is a simple unity quad.
         \item \textbf{houseGameObject:} the game object that represents house. It is used a simple unity cube with a red material attached on it, there is also a box collider
@@ -392,8 +392,8 @@
             MaxNHouse = \begin{cases} (roadLenght/gap) - 2, & \mbox{if } gap\mbox{ = 1} \\ (roadLenght/gap) - 1, & \mbox{} otherwise\  \end{cases}
         \end{equation}
 
-        The gap equal to 1 means that the house can be placed side by side along the roads. The roads can be orthogonal between them, so the house, which position is 
-        at the end of the roads, can be duplicated if the value returned is (roadLength/gap) - 1, see figure \ref{fig:cornerHouse}.
+        The gap equal to 1 means that the house can be placed side by side along the roads. The roads can be orthogonal between them, so the houses, which position is 
+        at the end of the road, can be duplicated if the value returned is (roadLength/gap) - 1, see figure \ref{fig:cornerHouse}.
         
         \begin{figure}
             \centering
@@ -411,7 +411,7 @@
     for different check. There is another important thing to do before the agent can start, it is to retrieve all valid points where the agent can be placed on the
     map, so all valid where the agent can place road and house, see section \ref{section: ValidPoints}.
 
-    Since unity terrain can be place at every position in the world, it is important to retrieve its position in order to place roads and house at right position on 
+    Since unity terrain can be placed at every position in the world, it is important to retrieve its position in order to place roads and house at right position on 
     terrain.
 
     Then every agent have to be placed on the map, in order to do that a random point from the list of all valid points is retrieved and assigned to location variable
@@ -440,7 +440,7 @@
 
     Then is the time to check if the point consider is too steep or not. In order to do that the method \textbf{CheckStepness} is used. This method, thanks to a
     raycast which is located at position given in input but with a different height, check the angle between the normal of the point and the up vector. If the 
-    angle is grater than 7, it means that the point is too steep for considering it as a good point to place road and house.
+    angle is grater than 7, it means that the point is too steep for considering it as a good point to place roads and houses.
     
     So every map point is checked, and it can be considered a valid one only if its height is greater than the average one plus 0.05 and the angle between the normal 
     and the up vector is less than 7. A list with all valid points is returned.
@@ -465,8 +465,8 @@
 
     Then it is needed to check the location steepness, this is done thanks to \textbf{CheckSteepness} method previously mentioned, see \ref{seciton:action}.
 
-    Since a road can be placed only given two points, and it will be placed along all the point between them, it is needed to check if on the point along the direction
-    from the previous location (current position of the agent) and location (the possible future position of the agent) there is something that will make location not 
+    Since a road can be placed only by given two points, and it will be placed along all the point between them, it is needed to check if the point along the direction
+    from the previous location (current agent position) and location (the possible future agent position) there is something that will make location not 
     a valid point. For every point between location and previous location, it is checked to its right and left and twice its right and left, if there is another point where
     a road is placed. This is done because the house are placed at the edge of the road, so in order to avoid house collision every road need an empty space along
     its edge. So if there is a point to its right or left \textbf{or} twice its right or left, the location considered is not a valid one. Instead, if there is a road to
@@ -478,7 +478,7 @@
     At the end it is checked if along the point between location and previous location there is already another road.
 
     \subsection{Create Road} \label{section:CreateRoad}
-    This method, starting from the location where the agent is, the previous location and terrain position place a road on terrain. The first thing done is to retrieve 
+    This method, starting from the location where the agent is, the previous location and terrain position, place a road on terrain. The first thing done is to retrieve 
     world coordinate (Vector3) of location and previous location from terrain one (Vector2). Then a direction, from previous location to location, is computed as well as the distance
     between them. Before it is possible to instantiate the road it is needed to compute its rotation and scaling. For the rotation it is used the 
     method called \textbf{Quaternion.LookRotation} which take in input the direction in which the road have to look at and the up vector. Then it is computed the Vector3
@@ -489,9 +489,9 @@
     \subsection{Create House} \label{section:CreateHouse}
     It receives in input, as the previous method, the previous and current location and terrain position. Then the world coordinates of previous and current location are 
     computed like the direction from previous to current location. The first house is placed all the times to the middle of the road, so this point is found using the \textbf{Lerp}
-    function between previous and current location. Then the rotation is calculated, as previously for the road, with \textbf{Quaternion.LookRotation} method, this time as the
-    first input is given the cross product between the direction vector and the up vector. Since the cross product give back the orthogonal vector between the two in input
-    it is retrieved perpendicular direction than the direction. So the house ``will always look'' the roads as well as the forward vector. Thanks to that, the house is
+    function between previous and current location. Then the rotation is calculated, as previously for the road, with \textbf{Quaternion.LookRotation} method, this time the
+    first input is the cross product between the direction vector and the up vector. Since the cross product give back the orthogonal vector between the two in input
+    it is retrieved the perpendicular direction than direction. So the house ``will always look'' the roads as well as the forward vector. Thanks to that, the house is
     translated to one unit behind using \textbf{-Vector3.forward}. If the parameter related to the number of house to place is equal to 1 means that the work of the agent ends, 
     otherwise the position for the other house have to be computed. 
     
@@ -642,10 +642,10 @@
     point are used for scoring the best point in which to move, see section \ref{section:attractor}.
     
     Since the first harbor is usually placed when the agent is placed on the map, the agent have to place a number of harbors equal to the number of tokens minus 1. Then a 
-    location where the agent can move is searched. If it is found, a harbor is placed, otherwise a placeholder value is returned in order to communicate that near valid point
+    location where the agent can move is searched. If it is found, a harbor is placed, otherwise a placeholder value is returned in order to communicate that near valid points
     isn't available, so the agent is moved to a random coastline point.
 
-    After an agent ends its work, the list used for keeping track of the already visited point is clean, since it is related to a single agent.
+    After an agent ends its work, the list used for keeping track of the already visited points is clean, since it is related to a single agent.
 
     \subsection{Valid Points} \label{section:HarborValidPoints}
     A valid point is a point where its height is greater than 0.03 and if there is at least one near point which respect some constraints, these are checked thanks to
@@ -667,11 +667,11 @@
     as big as the harbor length, there is another harbor or not, if it is, the point considered is not a valid one. Then it is needed to check all surrounding point of the 
     one given in input and try to find a direction in which is possible to place the harbor, see section \ref{section:harborNearby}.
 
-    Here, the list which represents the candidate point is filled with the valid surrounding point of the location given in input, if there are. It is not needed to return it,
+    Here, the list which represents the candidate points is filled with the valid surrounding points of the location given in input, if there are. It is not needed to return it,
     since it is located on the heap and its values are preserved. 
     
     \subsection{Check Nearby Point} \label{section:harborNearby}
-    This method receives two input, the location and a candidate point which is one of the point surrounding location called candidate. The first thing checked is
+    This method receives two input, the location and a candidate point which is one of the points surrounding location called candidate. The first thing checked is
     if the candidate is a sea point, so if its height is equal to 0. In order to place the harbor, it is important to check all the point along the direction defined by those
     two point and their right and left points. The number of points to check along that direction are equal to the maximum harbor length, since at this time the length for 
     a harbor isn't decided yet.
