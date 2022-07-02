@@ -45,7 +45,7 @@
     the work it was meant to do.
 
     Starting from this information and thanks to the work of Jonathon Doran and Ian Parberry, \cite{article}, I have developed a controlled procedural terrain generator using software 
-    agent, capable of generating an island and add details to it like city, trees and harbors.
+    agent, capable of generating an island and add details to it like city, trees and harbors according to the parameters specified by designers for each agent.
 
     \newpage
 
@@ -717,7 +717,7 @@
     \end{equation}
 
     \noindent
-    Where d(p, r) is the distance between the point and the repulsor and d(p, a) is the distance between the point and the repulsor.
+    Where d(p, r) is the distance between the point and the repulsor and d(p, a) is the distance between the point and the attractor.
 
     \subsection{Place Harbor} \label{section:PlaceHarbor}
     This method takes in input the location where to place the harbor and a nearby sea point in order to calculate a direction useful for harbor rotation.
@@ -778,11 +778,26 @@
 
     \begin{figure}[H]
         \centering     %%% not \center
-        \subfigure[]{\includegraphics[width=60mm]{images/Overall/3/1}}
-        \subfigure[]{\includegraphics[width=60mm]{images/Overall/3/2}}
-        \subfigure[]{\includegraphics[width=60mm]{images/Overall/3/3}}
-        \subfigure[]{\includegraphics[width=60mm]{images/Overall/3/4}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/4/1}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/4/2}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/4/3}}
+        \subfigure[]{\includegraphics[width=60mm]{images/Overall/4/4}}
     \end{figure}
+
+    \newpage
+
+    \section{Future Improvements}
+    One of the possible improvements is to implement all the possible agent already present in the Jonathon Doran and Ian Parberry's work,
+    see \\ \cite{article}.
+    
+    It is possible to improve the city agent letting it not only create straight or perpendicular roads, but roads with different angle between each
+    others. Another improvement can be to link different zone created by different agent and making this an option which is possible to select by designer.
+
+    For all the agent which add details to the map, it is an excellent improvement modify the unity editor and create a button in order to start their work. 
+    Since this is a procedural terrain generator, it is a good idea to make the asset generated permanent than let them disappear after unity run is done.
+    In this way the designer can modify the asset generated adding some details or change it in a better way.
+
+    At the end it is possible to add a lot of different agents, like the one presented in this document, capable of adding details to the map generated. 
 
     \newpage
     \bibliographystyle{unsrtnat}

@@ -11,6 +11,7 @@ public class TreeAgent : MonoBehaviour
     private int _x;
     private int _y;
     private float[,] _heightmap;
+    private Vector3 _terrainPos;
 
     // Agent data
     public int agentNr;
@@ -64,6 +65,7 @@ public class TreeAgent : MonoBehaviour
         _td = _terrain.terrainData;
         _x = _td.heightmapResolution;
         _y = _td.heightmapResolution;
+        _terrainPos = _terrain.GetPosition();
 
         //Initialize heightmap
         _heightmap = new float[_x, _y];
@@ -87,7 +89,7 @@ public class TreeAgent : MonoBehaviour
     private Vector3 GetPoint(Vector2 location)
     {
         //Create origin for raycast that is above the terrain
-        Vector3 origin = new Vector3(location.x, _td.size.y + 10, location.y);
+        Vector3 origin = new Vector3(location.x + _terrainPos.x, _td.size.y + 10, location.y + _terrainPos.z);
 
         //Send the raycast.
         Physics.Raycast(origin, Vector3.down, out var hit, Mathf.Infinity, LayerMask.GetMask("Terrain"));
@@ -101,8 +103,6 @@ public class TreeAgent : MonoBehaviour
         _heightmap = _td.GetHeights(0, 0, _x, _y);
 
         _validPoints = ValidPoints();
-
-        Vector3 terrainPos = _terrain.GetPosition();
 
         for (int i = 0; i < agentNr; i++)
         {
@@ -129,7 +129,7 @@ public class TreeAgent : MonoBehaviour
                     candidate = checkCandidate;
                     
                     // Place tree
-                    Instantiate(tree, GetPoint(new Vector2(terrainPos.x + candidate.x, terrainPos.z + candidate.y)), Quaternion.identity);
+                    Instantiate(tree, GetPoint(new Vector2(candidate.x, candidate.y)), Quaternion.identity);
                 }
 
                 yield return new WaitForEndOfFrame();
@@ -189,7 +189,7 @@ public class TreeAgent : MonoBehaviour
     private bool CheckSteepness(Vector2 location)
     {
         //Create origin for raycast that is above the terrain.S
-        Vector3 origin = new Vector3(location.x, _td.size.y + 10, location.y);
+        Vector3 origin = new Vector3(location.x + _terrainPos.x, _td.size.y + 10, location.y + _terrainPos.z);
 
         //Send the raycast.
         Physics.Raycast(origin, Vector3.down, out var hit);
