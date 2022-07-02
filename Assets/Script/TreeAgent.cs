@@ -188,7 +188,7 @@ public class TreeAgent : MonoBehaviour
 
     private bool CheckSteepness(Vector2 location)
     {
-        //Create origin for raycast that is above the terrain.S
+        //Create origin for raycast that is above the terrain
         Vector3 origin = new Vector3(location.x + _terrainPos.x, _td.size.y + 10, location.y + _terrainPos.z);
 
         //Send the raycast.
