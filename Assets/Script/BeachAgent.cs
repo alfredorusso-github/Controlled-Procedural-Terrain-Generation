@@ -19,6 +19,9 @@ public class BeachAgent : MonoBehaviour
     public int randomWalkSize;
     public int awayLimit;
     [Range(.003f, .01f)] public float beachHeight;
+    
+    // Agent stuck
+    private readonly Vector2Int _stuck = - Vector2Int.one;
 
     private readonly Vector2Int[] _neighboringPoints =
     {
@@ -68,7 +71,7 @@ public class BeachAgent : MonoBehaviour
 
         List<Vector2Int> shorelinePoints = GetShorelinePoints();
 
-        Debug.Log("Starting generating beach...");
+        Debug.Log("Started generating beach...");
 
         for (int i = 0; i < beachAgentsNr; i++)
         {
@@ -119,7 +122,7 @@ public class BeachAgent : MonoBehaviour
                     }
 
                     away = GetNeighboringPoint(away);
-                    if (away == -Vector2.one)
+                    if (away == _stuck)
                     {
                         break;
                     }
@@ -134,7 +137,7 @@ public class BeachAgent : MonoBehaviour
 
         yield return new WaitForEndOfFrame();
 
-        Debug.Log("Finish generating beach...");
+        Debug.Log("Finished generating beach...");
 
         SplatMap.Instance.MakeSplatMap();
 
@@ -188,7 +191,7 @@ public class BeachAgent : MonoBehaviour
         }
         
         Debug.Log("Impossible to find a valid point");
-        return -Vector2Int.one;
+        return _stuck;
     }
 
     private bool IsInsideTerrain(Vector2Int location)

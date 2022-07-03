@@ -69,8 +69,6 @@ public class TreeAgent : MonoBehaviour
 
         //Initialize heightmap
         _heightmap = new float[_x, _y];
-
-        // StartCoroutine(Action());
     }
 
     private void OnDrawGizmos()
@@ -103,6 +101,8 @@ public class TreeAgent : MonoBehaviour
         _heightmap = _td.GetHeights(0, 0, _x, _y);
 
         _validPoints = ValidPoints();
+        
+        Debug.Log("Started generating trees...");
 
         for (int i = 0; i < agentNr; i++)
         {
@@ -135,7 +135,9 @@ public class TreeAgent : MonoBehaviour
                 yield return new WaitForEndOfFrame();
             }
         }
-
+        
+        Debug.Log("Finished generating trees...");
+        
         yield return HarborAgent.Instance.Action();
     }
 

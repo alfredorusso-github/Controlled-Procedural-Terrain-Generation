@@ -64,7 +64,7 @@ public class SmoothingAgent : MonoBehaviour
         _heightmap = _td.GetHeights(0, 0, _x ,_y);
         _coastlinePoints = FindObjectOfType<CoastlineAgent>().CoastlinePoints();
 
-        Debug.Log("Starting smoothing...");
+        Debug.Log("Started smoothing...");
 
         for (int i = 0; i < smoothingAgentsNr; i++){
             
@@ -97,7 +97,7 @@ public class SmoothingAgent : MonoBehaviour
 
         yield return new WaitForEndOfFrame();
 
-        Debug.Log("Finish smoothing...");
+        Debug.Log("Smoothing finished...");
                 
         yield return BeachAgent.Instance.Action();
     }

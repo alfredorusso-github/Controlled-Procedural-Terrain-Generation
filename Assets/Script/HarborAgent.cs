@@ -28,6 +28,9 @@ public class HarborAgent : MonoBehaviour
     
     // Visited location
     private List<Vector2> _visitedLocation;
+    
+    // Agent stuck
+    private readonly Vector2 _stuck = - Vector2.one;
 
     // OnDrawGizmos
     bool _start;
@@ -73,8 +76,6 @@ public class HarborAgent : MonoBehaviour
         _x = _td.heightmapResolution;
         _y = _td.heightmapResolution;
         _terrainPos = _terrain.GetPosition();
-
-        // StartCoroutine(Action());
     }
 
     private void OnDrawGizmos()
@@ -107,7 +108,7 @@ public class HarborAgent : MonoBehaviour
         // List used for keeping truck already visited point for a single agent
         _visitedLocation = new List<Vector2>();
         
-        Debug.Log("Starting placing Harbors");
+        Debug.Log("Started placing Harbors");
         
         for (int i = 0; i < agentNr; i++)
         {
@@ -117,7 +118,7 @@ public class HarborAgent : MonoBehaviour
             Vector2 location = GetStartingPoint(candidates);
             
             // The agent can't find a point where it is possible to place the harbor
-            if (location == -Vector2.one)
+            if (location == _stuck)
             {
                 Debug.Log("No more point available where to place harbor...");
                 _visitedLocation.Clear();
@@ -138,7 +139,7 @@ public class HarborAgent : MonoBehaviour
                 location = FindNewLocation(location, attractor, repulsor);
                 
                 // No location was found
-                if (location == -Vector2.one)
+                if (location == _stuck)
                 {
                     Debug.Log("No more point available where to place harbor...");
                     location = RandomPoint();
@@ -206,7 +207,7 @@ public class HarborAgent : MonoBehaviour
             location = RandomPoint();
         }
         
-        return -Vector2.one;
+        return _stuck;
     }
 
     private Vector2 FindNewLocation(Vector2 location, Vector2 attractor, Vector2 repulsor)
@@ -217,7 +218,7 @@ public class HarborAgent : MonoBehaviour
             location = NewLocation(location, attractor, repulsor);
             
             // Agent get stuck
-            if (location == -Vector2.one)
+            if (location == _stuck)
             {
                 _visitedLocation.Clear();
                 location = RandomPoint();
@@ -248,7 +249,7 @@ public class HarborAgent : MonoBehaviour
         
             location = NewLocation(location, attractor, repulsor);
         
-            if (location == -Vector2.one)
+            if (location == _stuck)
             {
                 location = RandomPoint();
             }
@@ -257,7 +258,7 @@ public class HarborAgent : MonoBehaviour
             _visitedLocation.Add(location);
         }
         
-        return -Vector2.one;
+        return _stuck;
     }
     
     private Vector2 NewLocation(Vector2 location, Vector2 attractor, Vector2 repulsor)
@@ -276,7 +277,7 @@ public class HarborAgent : MonoBehaviour
         if (candidates.Count == 0)
         {
             Debug.Log("Agent stuck, move it to a random coastline point");
-            return -Vector2.one;
+            return _stuck;
         }
 
         List<float> scores = new List<float>();
@@ -339,7 +340,7 @@ public class HarborAgent : MonoBehaviour
             }
             
             // Check if the harbor collide with other one
-            bool check = Physics.Raycast(new Vector3(pointToCheck.x, 100, pointToCheck.y), Vector3.down, Mathf.Infinity,
+            bool check = Physics.Raycast(new Vector3(pointToCheck.x, _td.size.y + 10, pointToCheck.y), Vector3.down, Mathf.Infinity,
                 LayerMask.GetMask("Harbor"));
             if (check)
             {
@@ -352,8 +353,8 @@ public class HarborAgent : MonoBehaviour
 
     private float GetHeight(Vector2 location)
     {
-        //Create origin for raycast that is above the terrain. I chose 200.
-        Vector3 origin = new Vector3(location.x + _terrainPos.x, 200, location.y + _terrainPos.z);
+        //Create origin for raycast which is above the terrain.
+        Vector3 origin = new Vector3(location.x + _terrainPos.x, _td.size.y + 10, location.y + _terrainPos.z);
 
         //Send the raycast.
         Physics.Raycast(origin, Vector3.down, out var hit, Mathf.Infinity, LayerMask.GetMask("Terrain"));

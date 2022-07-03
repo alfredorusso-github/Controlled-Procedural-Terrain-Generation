@@ -116,6 +116,8 @@ public class CoastlineAgent : MonoBehaviour
 
     private IEnumerator Action()
     {
+        Debug.Log("Started raising points...");
+        
         while (_agents.Count != 0)
         {
             Agent agent = (Agent)_agents.Dequeue();
@@ -159,6 +161,8 @@ public class CoastlineAgent : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         Debug.Log("Vertex Elevated: " + _elevatedVertex);
+        
+        Debug.Log("Finished raising points...");
 
         yield return SmoothingAgent.Instance.Action();
     }

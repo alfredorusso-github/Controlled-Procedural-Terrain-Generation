@@ -63,8 +63,6 @@ public class CityAgent : MonoBehaviour
         _heightmap = new float[_x, _y];
 
         _points = new List<Vector2Int>();
-
-        // StartCoroutine(Action());
     }
 
     private void OnDrawGizmos()
@@ -93,6 +91,8 @@ public class CityAgent : MonoBehaviour
     public IEnumerator Action()
     {
         _heightmap = _td.GetHeights(0, 0, _x, _y);
+        
+        Debug.Log("Started generating cities...");
 
         List<Vector2Int> validPoints = GetValidPoints();
         Debug.Log("Number of valid points: " + validPoints.Count);
@@ -127,6 +127,8 @@ public class CityAgent : MonoBehaviour
             }
 
         }
+        
+        Debug.Log("Finished generating cities...");
 
         yield return TreeAgent.Instance.Action();
     }
@@ -174,7 +176,7 @@ public class CityAgent : MonoBehaviour
 
     private bool CheckSteepness(Vector2 location)
     {
-        //Create origin for raycast that is above the terrain. I chose 100.
+        //Create origin for raycast that is above the terrain.
         Vector3 origin = new Vector3(location.x + _terrainPos.x, _td.size.y + 10f, location.y + _terrainPos.z);
 
         //Send the raycast.
@@ -269,8 +271,8 @@ public class CityAgent : MonoBehaviour
             Vector2 left = previousLocation - perpendicularDir;
             Vector2 left2 = previousLocation - perpendicularDir * 2;
 
-            bool isHit1 = Physics.Raycast(new Vector3(right.x + _terrainPos.x, 80.0f, right.y + _terrainPos.z), Vector3.down, out hit1, Mathf.Infinity);
-            bool isHit2 = Physics.Raycast(new Vector3(right2.x + _terrainPos.x, 80.0f, right2.y + _terrainPos.z), Vector3.down, out hit2, Mathf.Infinity);
+            bool isHit1 = Physics.Raycast(new Vector3(right.x + _terrainPos.x, _td.size.y + 10, right.y + _terrainPos.z), Vector3.down, out hit1, Mathf.Infinity);
+            bool isHit2 = Physics.Raycast(new Vector3(right2.x + _terrainPos.x, _td.size.y + 10, right2.y + _terrainPos.z), Vector3.down, out hit2, Mathf.Infinity);
             if (isHit1 && isHit2)
             {
                 if ((hit1.collider.name == "Quad") != (hit2.collider.name == "Quad"))
@@ -279,8 +281,8 @@ public class CityAgent : MonoBehaviour
                 }
             }
 
-            isHit1 = Physics.Raycast(new Vector3(left.x + _terrainPos.x, 80.0f, left.y + _terrainPos.z), Vector3.down, out hit1, Mathf.Infinity);
-            isHit2 = Physics.Raycast(new Vector3(left2.x + _terrainPos.x, 80.0f, left2.y + _terrainPos.z), Vector3.down, out hit2, Mathf.Infinity);
+            isHit1 = Physics.Raycast(new Vector3(left.x + _terrainPos.x, _td.size.y + 10, left.y + _terrainPos.z), Vector3.down, out hit1, Mathf.Infinity);
+            isHit2 = Physics.Raycast(new Vector3(left2.x + _terrainPos.x, _td.size.y + 10, left2.y + _terrainPos.z), Vector3.down, out hit2, Mathf.Infinity);
             if (isHit1 && isHit2)
             {
                 if ((hit1.collider.name == "Quad") != (hit2.collider.name == "Quad"))
@@ -290,7 +292,7 @@ public class CityAgent : MonoBehaviour
             }
 
             // Check if along the direction where will be placed the road, there is already another road
-            isHit1 = Physics.Raycast(new Vector3(previousLocation.x + _terrainPos.x, 80.0f, previousLocation.y + _terrainPos.z), Vector3.down, out hit1, Mathf.Infinity);
+            isHit1 = Physics.Raycast(new Vector3(previousLocation.x + _terrainPos.x, _td.size.y + 10, previousLocation.y + _terrainPos.z), Vector3.down, out hit1, Mathf.Infinity);
             if (isHit1)
             {
                 if (hit1.collider.name == "Quad")
