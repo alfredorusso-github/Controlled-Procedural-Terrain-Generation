@@ -407,8 +407,8 @@ public class HarborAgent : MonoBehaviour
     private void PlaceHarbor(Vector2 location, List<Vector2> candidates)
     {
         //Debug
-        DrawDir(location, candidates);
-        _locations.Add(GetPoint(location));
+        // DrawDir(location, candidates);
+        // _locations.Add(GetPoint(location));
         
         Vector3 worldLocation = GetPoint(new Vector2(location.x, location.y));
         Vector3 candidatesWorldLocation = GetPoint(candidates[Random.Range(0, candidates.Count)]);

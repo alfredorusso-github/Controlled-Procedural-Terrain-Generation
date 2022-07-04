@@ -79,7 +79,7 @@ public class BeachAgent : MonoBehaviour
 
             for (int j = 0; j < beachTokens; j++)
             {
-                if (_heightmap[location.y, location.x] >= heightLimit)
+                if (location == _stuck || _heightmap[location.y, location.x] >= heightLimit)
                 {
                     location = shorelinePoints[Random.Range(0, shorelinePoints.Count)];
                 }

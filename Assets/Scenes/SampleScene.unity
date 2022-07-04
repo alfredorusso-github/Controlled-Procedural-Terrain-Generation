@@ -219,7 +219,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 77329738}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 200, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -253,9 +253,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fb5d5a4266d9ff2d8bcfbc8a76a6244, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smoothingAgentsNr: 2000
+  smoothingAgentsNr: 1800
   returnValue: 2
-  smoothingTokens: 2500
+  smoothingTokens: 2000
 --- !u!114 &77329745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -287,8 +287,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 34b9b52151c45c40bada96c4f5a12005, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  beachAgentsNr: 50
-  beachTokens: 20
+  beachAgentsNr: 100
+  beachTokens: 50
   heightLimit: 0.01
   randomWalkSize: 30
   awayLimit: 3
@@ -322,7 +322,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a85c0bf98b39fe72992ce91c67797dcc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentNr: 5
+  agentNr: 3
   token: 5
   timesSearchingPoint: 200
   distance: 30
