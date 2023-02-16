@@ -73,7 +73,7 @@ crashlytics-build.properties
 
 #other files not needed
 *.blob
-/[Pp]ackages
+#/[Pp]ackages
 *.xml
 *.idea
 
