@@ -45,7 +45,7 @@ Harbor agent: like city agent even here a placeholder is used for representing h
 
 ## Usage
 
-The project was built with unity editor version 2020.3.20f1 so it is recommended to use it. 
+The project was built with unity editor version 2020.3.20f1 but recently it is updated to the version 2021.3.19f1 so it is recommended to use it. 
 
 Once opened it is necessary to open the scene at `Assets/Scenes/SampleScene.unity` and select the component __Terrain__ within the hierarchy that appears as follows:
 
